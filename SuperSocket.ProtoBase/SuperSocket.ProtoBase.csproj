@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>SuperSocket.ProtoBase</PackageId>
+    <PackageTags>socket;supersocket</PackageTags>
+    <Title>SuperSocket.ProtoBase</Title>
+    <Description>SuperSocket.ProtoBase</Description>
+    <Authors>Kerry Jiang;Sarco</Authors>
+    <TargetFrameworks>netstandard2.0;net40;net45;net451</TargetFrameworks>
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+
+</Project>
