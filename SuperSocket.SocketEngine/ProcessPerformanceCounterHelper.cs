@@ -141,6 +141,11 @@ namespace SuperSocket.SocketEngine
                     statusCollection[StatusInfoKeys.TotalThreadCount] = (int)m_ThreadCountPC.NextValue();
                     statusCollection[StatusInfoKeys.CpuUsage] = m_CpuUsagePC.NextValue() / m_CpuCores;
                     statusCollection[StatusInfoKeys.MemoryUsage] = (long)m_WorkingSetPC.NextValue();
+#else
+                    var proc = Process.GetCurrentProcess();
+                    statusCollection[StatusInfoKeys.TotalThreadCount] = proc.Threads.Count;
+                    statusCollection[StatusInfoKeys.CpuUsage] = proc.TotalProcessorTime.TotalMilliseconds / 1000;
+                    statusCollection[StatusInfoKeys.MemoryUsage] = proc.WorkingSet64 / 1024;
 #endif
 
                     break;
