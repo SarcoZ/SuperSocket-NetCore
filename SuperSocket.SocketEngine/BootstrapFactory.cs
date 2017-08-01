@@ -2,11 +2,13 @@
 using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketEngine.Configuration;
 using System;
-using System.IO;
+using System.Linq;
+using System.Threading;
 #if !NETSTANDARD2_0
 using System.Configuration;
 #else
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 #endif
 
 namespace SuperSocket.SocketEngine
@@ -67,8 +69,8 @@ namespace SuperSocket.SocketEngine
 
             return CreateBootstrap(configSource);
 #else
-            var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";
-            return CreateBootstrapFromConfigFile(configFile);           
+            var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";           
+            return CreateBootstrapFromConfigFile(configFile);
 #endif
         }
 
@@ -88,17 +90,8 @@ namespace SuperSocket.SocketEngine
             return CreateBootstrap(configSource);
 #else
 
-            var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";          
-            var configurationRoot = new ConfigurationBuilder()
-                        .AddInMemoryCollection()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddXmlFile(configFile, optional: true, reloadOnChange: true)
-                        .Build();
-
-            var configSource = new ConfigurationSource(new SocketServiceConfig(configurationRoot.GetSection(configSectionName)));
-            if (configSource == null)
-                throw new InvalidOperationException("Invalid 'superSocket' or 'socketServer' configuration section.");
-            return CreateBootstrap(configSource);
+            var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";         
+            return CreateBootstrapFromConfigFile(configFile, configSectionName);
 #endif
         }
 
@@ -107,7 +100,7 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="configFile">The configuration file.</param>
         /// <returns></returns>
-        public static IBootstrap CreateBootstrapFromConfigFile(string configFile)
+        public static IBootstrap CreateBootstrapFromConfigFile(string configFile, string configSectionName = "")
         {
 #if !NETSTANDARD2_0
             ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap();
@@ -121,18 +114,63 @@ namespace SuperSocket.SocketEngine
                 configSection = config.GetSection("socketServer");
 
             return CreateBootstrap(configSection as SocketBase.Config.IConfigurationSource);
-#else
+#else            
+            IBootstrap bootstrap;
             var configurationRoot = new ConfigurationBuilder()
-                        .AddInMemoryCollection()
-                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .SetBasePath(AppContext.BaseDirectory)
                         .AddXmlFile(configFile, optional: true, reloadOnChange: true)
                         .Build();
 
-            var configSource = new ConfigurationSource(new SocketServiceConfig(configurationRoot));
+            var configSource = new ConfigurationSource(new SocketServiceConfig(string.IsNullOrEmpty(configSectionName) ? (IConfiguration)configurationRoot
+                : configurationRoot.GetSection(configSectionName)));
             if (configSource == null)
                 throw new InvalidOperationException("Invalid 'superSocket' or 'socketServer' configuration section.");
-            return CreateBootstrap(configSource);
+
+            bootstrap = CreateBootstrap(configSource);
+
+            ChangeToken.OnChange(
+               () => configurationRoot.GetReloadToken(),
+               () =>
+               {
+                   Thread.Sleep(5000);
+                   OnSettingChanged(bootstrap, configurationRoot);
+               });
+
+            return bootstrap;
 #endif
         }
+
+#if NETSTANDARD2_0     
+        /// <summary>
+        /// Configuration changed callback
+        /// </summary>
+        /// <param name="state"></param>
+        private static void OnSettingChanged(IBootstrap bootstrap,IConfigurationRoot configurationRoot)
+        {
+            var configSource = new ConfigurationSource(new SocketServiceConfig(configurationRoot));
+            if (configSource == null)
+                return;
+          
+            foreach (var serverConfig in configSource.Servers)
+            {
+                var server = bootstrap.AppServers.FirstOrDefault(x =>
+                        x.Name.Equals(serverConfig.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (server == null)
+                    continue;
+
+                server.ReportPotentialConfigChange(new ServerConfig(serverConfig));
+            }
+
+            var loggerProvider = bootstrap as ILoggerProvider;
+            if (loggerProvider != null)
+            {
+                var logger = loggerProvider.Logger;
+
+                if (logger != null)
+                    logger.Info("Configuraton reloaded!");
+            }
+        }
+#endif
     }
 }

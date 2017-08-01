@@ -8,14 +8,8 @@ namespace TelnetServer_05_StartByConfig
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine("Press any key to start the server!");
-
-            var m = System.Reflection.Assembly.GetEntryAssembly();
-
-
-            //Console.ReadKey();
-            //Console.WriteLine();
-
+            Console.WriteLine("Press any key to start the server!");
+                  
             var bootstrap = BootstrapFactory.CreateBootstrap();
 
             if (!bootstrap.Initialize())
