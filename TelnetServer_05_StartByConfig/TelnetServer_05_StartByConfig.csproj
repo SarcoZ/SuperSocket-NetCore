@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -25,11 +24,9 @@
     <ProjectReference Include="..\SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj" />
     <ProjectReference Include="..\SuperSocketNetCore.SocketEngine\SuperSocketNetCore.SocketEngine.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="App.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

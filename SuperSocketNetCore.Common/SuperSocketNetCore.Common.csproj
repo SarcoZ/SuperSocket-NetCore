@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
   <PropertyGroup>
-    <PackageId>SuperSocket.Common</PackageId>
-    <PackageTags>socket;supersocket</PackageTags>
-    <Title>SuperSocket.Common</Title>
-    <Description>SuperSocket.Library</Description>
-    <Authors>Kerry Jiang;Sarco</Authors>
-    <TargetFrameworks>netstandard2.0;net40;net45;net451;net452</TargetFrameworks>
-    <Version>2.0.0</Version>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <PackageId>SuperSocketNetCore.Common</PackageId>
+    <Title>SuperSocketNetCore.Common</Title>
+    <RootNamespace>SuperSocket.Common</RootNamespace>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net452'">
     <Reference Include="System" />
@@ -19,20 +13,10 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Extensions.Configuration">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Options">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions">
-      <Version>2.0.0</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
   </ItemGroup>
 </Project>

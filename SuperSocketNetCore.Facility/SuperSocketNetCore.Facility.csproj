@@ -1,15 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
   <PropertyGroup>
-    <PackageId>SuperSocket.Facility</PackageId>
-    <PackageTags>socket;supersocket</PackageTags>
-    <Title>SuperSocket.Dlr</Title>
-    <Description>SuperSocket.Library</Description>
-    <Authors>Kerry Jiang;Sarco</Authors>
-    <TargetFrameworks>netstandard2.0;net40;net45;net451;net452</TargetFrameworks>
-    <Version>2.0.0</Version>
+    <PackageId>SuperSocketNetCore.Facility</PackageId>
+    <Title>SuperSocketNetCore.Facility</Title>
+    <RootNamespace>SuperSocket.Facility</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SuperSocket.SocketBase\SuperSocket.SocketBase.csproj" />
+    <ProjectReference Include="..\SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj" />
   </ItemGroup>
-
 </Project>

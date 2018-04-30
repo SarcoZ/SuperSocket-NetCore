@@ -1,20 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
   <PropertyGroup>
-    <PackageId>SuperSocket.Dlr</PackageId>
-    <PackageTags>socket;supersocket</PackageTags>
-    <Title>SuperSocket.Dlr</Title>
-    <Description>SuperSocket.Library</Description>
-    <Authors>Kerry Jiang;Sarco</Authors>
-    <TargetFrameworks>netstandard2.0;net40;net45;net451;net452</TargetFrameworks>
-    <Version>2.0.0</Version>
+    <PackageId>SuperSocketNetCore.Dlr</PackageId>
+    <Title>SuperSocketNetCore.Dlr</Title>
+    <RootNamespace>SuperSocket.Dlr</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SuperSocket.SocketBase\SuperSocket.SocketBase.csproj" />
+    <ProjectReference Include="..\SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Scripting">
       <HintPath>..\Reference\DLR\Net40\Microsoft.Scripting.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>

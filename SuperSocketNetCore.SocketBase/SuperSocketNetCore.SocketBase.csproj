@@ -1,15 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
   <PropertyGroup>
-    <PackageId>SuperSocket.SocketBase</PackageId>
-    <PackageTags>socket;supersocket</PackageTags>
-    <Title>SuperSocket.SocketEngine</Title>
-    <Description>SuperSocket.SocketEngine</Description>
-    <Authors>Kerry Jiang;Sarco</Authors>
-    <TargetFrameworks>netstandard2.0;net40;net45;net451;net452</TargetFrameworks>
-    <Version>2.0.0</Version>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <PackageId>SuperSocketNetCore.SocketBase</PackageId>
+    <Title>SuperSocketNetCore.SocketBase</Title>
+    <RootNamespace>SuperSocket.SocketBase</RootNamespace>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net451' OR '$(TargetFramework)' == 'net452'">
     <Reference Include="System" />
@@ -21,6 +15,6 @@
     <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SuperSocket.Common\SuperSocket.Common.csproj" />
+    <ProjectReference Include="..\SuperSocketNetCore.Common\SuperSocketNetCore.Common.csproj" />
   </ItemGroup>
 </Project>
