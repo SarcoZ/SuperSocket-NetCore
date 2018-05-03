@@ -56,6 +56,8 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         protected ILogFactory LogFactory { get; private set; }
 
+        public IServiceProvider ServiceProvider { get; }
+
         /// <summary>
         /// Gets all the app servers running in this bootstrap
         /// </summary>
@@ -114,10 +116,10 @@ namespace SuperSocket.SocketEngine
         /// Initializes a new instance of the <see cref="DefaultBootstrap"/> class.
         /// </summary>
         /// <param name="appServers">The app servers.</param>
-        public DefaultBootstrap(IEnumerable<IWorkItem> appServers)
-            : this(new RootConfig(), appServers, new Log4NetLogFactory())
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public DefaultBootstrap(IEnumerable<IWorkItem> appServers, IServiceProvider serviceProvider)
+            : this(new RootConfig(), appServers, new Log4NetLogFactory(), serviceProvider)
         {
-
         }
 
         /// <summary>
@@ -125,10 +127,10 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="rootConfig">The root config.</param>
         /// <param name="appServers">The app servers.</param>
-        public DefaultBootstrap(IRootConfig rootConfig, IEnumerable<IWorkItem> appServers)
-            : this(rootConfig, appServers, new Log4NetLogFactory())
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public DefaultBootstrap(IRootConfig rootConfig, IEnumerable<IWorkItem> appServers, IServiceProvider serviceProvider)
+            : this(rootConfig, appServers, new Log4NetLogFactory(), serviceProvider)
         {
-
         }
 
         /// <summary>
@@ -137,7 +139,9 @@ namespace SuperSocket.SocketEngine
         /// <param name="rootConfig">The root config.</param>
         /// <param name="appServers">The app servers.</param>
         /// <param name="logFactory">The log factory.</param>
-        public DefaultBootstrap(IRootConfig rootConfig, IEnumerable<IWorkItem> appServers, ILogFactory logFactory)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public DefaultBootstrap(IRootConfig rootConfig, IEnumerable<IWorkItem> appServers, ILogFactory logFactory, IServiceProvider serviceProvider)
+            : this(serviceProvider)
         {
             if (rootConfig == null)
                 throw new ArgumentNullException("rootConfig");
@@ -179,7 +183,9 @@ namespace SuperSocket.SocketEngine
         /// Initializes a new instance of the <see cref="DefaultBootstrap"/> class.
         /// </summary>
         /// <param name="config">The config.</param>
-        public DefaultBootstrap(IConfigurationSource config)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public DefaultBootstrap(IConfigurationSource config, IServiceProvider serviceProvider)
+            : this(serviceProvider)
         {
             if (config == null)
                 throw new ArgumentNullException("config");
@@ -205,7 +211,9 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="config">The config.</param>
         /// <param name="startupConfigFile">The startup config file.</param>
-        public DefaultBootstrap(IConfigurationSource config, string startupConfigFile)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public DefaultBootstrap(IConfigurationSource config, string startupConfigFile, IServiceProvider serviceProvider)
+            : this(serviceProvider)
         {
             if (config == null)
                 throw new ArgumentNullException("config");
@@ -220,20 +228,23 @@ namespace SuperSocket.SocketEngine
             AppDomain.CurrentDomain.SetData("Bootstrap", this);
         }
 
+        private DefaultBootstrap(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
+        }
+
         /// <summary>
         /// Creates the work item instance.
         /// </summary>
         /// <param name="serviceTypeName">Name of the service type.</param>
         /// <param name="serverStatusMetadata">The server status metadata.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
         protected virtual IWorkItem CreateWorkItemInstance(
             string serviceTypeName,
-            StatusInfoAttribute[] serverStatusMetadata,
-            IServiceProvider serviceProvider)
+            StatusInfoAttribute[] serverStatusMetadata)
         {
             var serviceType = Type.GetType(serviceTypeName, true);
-            return ActivatorUtilities.CreateInstance(serviceProvider, serviceType) as IWorkItem;
+            return ActivatorUtilities.CreateInstance(ServiceProvider, serviceType) as IWorkItem;
         }
 
         internal virtual bool SetupWorkItemInstance(IWorkItem workItem, WorkItemFactoryInfo factoryInfo)
@@ -270,19 +281,15 @@ namespace SuperSocket.SocketEngine
         /// Initializes the bootstrap with a listen endpoint replacement dictionary
         /// </summary>
         /// <param name="listenEndPointReplacement">The listen end point replacement.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(
-            IDictionary<string, IPEndPoint> listenEndPointReplacement,
-            IServiceProvider serviceProvider)
+        public virtual bool Initialize(IDictionary<string, IPEndPoint> listenEndPointReplacement)
         {
-            return Initialize((c) => ReplaceListenEndPoint(c, listenEndPointReplacement, serviceProvider), serviceProvider);
+            return Initialize((c) => ReplaceListenEndPoint(c, listenEndPointReplacement));
         }
 
         private IServerConfig ReplaceListenEndPoint(
             IServerConfig serverConfig,
-            IDictionary<string, IPEndPoint> listenEndPointReplacement,
-            IServiceProvider serviceProvider)
+            IDictionary<string, IPEndPoint> listenEndPointReplacement)
         {
             var config = new ServerConfig(serverConfig);
 
@@ -328,7 +335,7 @@ namespace SuperSocket.SocketEngine
             return config;
         }
 
-        private IWorkItem InitializeAndSetupWorkItem(WorkItemFactoryInfo factoryInfo, IServiceProvider serviceProvider)
+        private IWorkItem InitializeAndSetupWorkItem(WorkItemFactoryInfo factoryInfo)
         {
             IWorkItem appServer;
 
@@ -336,8 +343,7 @@ namespace SuperSocket.SocketEngine
             {
                 appServer = CreateWorkItemInstance(
                     factoryInfo.ServerType,
-                    factoryInfo.StatusInfoMetadata,
-                    serviceProvider);
+                    factoryInfo.StatusInfoMetadata);
 
                 if (m_GlobalLog.IsDebugEnabled)
                     m_GlobalLog.DebugFormat("The server instance {0} has been created!", factoryInfo.Config.Name);
@@ -381,18 +387,13 @@ namespace SuperSocket.SocketEngine
             return appServer;
         }
 
-
         /// <summary>
         /// Initializes the bootstrap with the configuration, config resolver and log factory.
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
         /// <param name="logFactory">The log factory.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(
-            Func<IServerConfig, IServerConfig> serverConfigResolver,
-            ILogFactory logFactory,
-            IServiceProvider serviceProvider)
+        public virtual bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory)
         {
             if (m_Initialized)
                 throw new Exception("The server had been initialized already, you cannot initialize it again!");
@@ -435,7 +436,7 @@ namespace SuperSocket.SocketEngine
             //Initialize servers
             foreach (var factoryInfo in workItemFactories)
             {
-                IWorkItem appServer = InitializeAndSetupWorkItem(factoryInfo, serviceProvider);
+                IWorkItem appServer = InitializeAndSetupWorkItem(factoryInfo);
 
                 if (appServer == null)
                     return false;
@@ -499,34 +500,29 @@ namespace SuperSocket.SocketEngine
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(
-            Func<IServerConfig, IServerConfig> serverConfigResolver,
-            IServiceProvider serviceProvider)
+        public virtual bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
         {
-            return Initialize(serverConfigResolver, null, serviceProvider);
+            return Initialize(serverConfigResolver, null);
         }
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <param name="logFactory">The log factory.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(ILogFactory logFactory, IServiceProvider serviceProvider)
+        public virtual bool Initialize(ILogFactory logFactory)
         {
-            return Initialize(c => c, logFactory, serviceProvider);
+            return Initialize(c => c, logFactory);
         }
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(IServiceProvider serviceProvider)
+        public virtual bool Initialize()
         {
-            return Initialize(c => c, serviceProvider);
+            return Initialize(c => c);
         }
 
         /// <summary>

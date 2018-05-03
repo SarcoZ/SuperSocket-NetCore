@@ -15,7 +15,6 @@ namespace SuperSocket.SocketBase.Protocol
         protected RequestInfo(IServiceScope serviceScope)
             : base(serviceScope)
         {
-
         }
 
         /// <summary>

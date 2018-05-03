@@ -2,6 +2,7 @@
 using SuperSocket.SocketBase.Config;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SuperSocket.SocketEngine
 {
@@ -94,6 +95,8 @@ namespace SuperSocket.SocketEngine
             }
         }
 
+        public IServiceProvider ServiceProvider => throw new NotSupportedException();
+
         public IEnumerable<IWorkItem> AppServers
         {
             get { return m_Servers; }
@@ -104,27 +107,27 @@ namespace SuperSocket.SocketEngine
             get { return m_Bootstrap.Config; }
         }
 
-        public bool Initialize(IServiceProvider serviceProvider)
+        public bool Initialize()
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement, IServiceProvider serviceProvider)
+        public bool Initialize(IDictionary<string, IPEndPoint> listenEndPointReplacement)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, IServiceProvider serviceProvider)
+        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(ILogFactory logFactory, IServiceProvider serviceProvider)
+        public bool Initialize(ILogFactory logFactory)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory, IServiceProvider serviceProvider)
+        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory)
         {
             throw new NotSupportedException();
         }

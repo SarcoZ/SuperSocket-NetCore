@@ -30,7 +30,6 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Null RequestInfo
         /// </summary>
-        // TODO rgr
         protected readonly static TRequestInfo NullRequestInfo = default(TRequestInfo);
 
         /// <summary>

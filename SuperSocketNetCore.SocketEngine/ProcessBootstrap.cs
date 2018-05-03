@@ -22,10 +22,9 @@ namespace SuperSocket.SocketEngine
 
         protected override IWorkItem CreateWorkItemInstance(
             string serviceTypeName,
-            StatusInfoAttribute[] serverStatusMetadata,
-            IServiceProvider serviceProvider)
+            StatusInfoAttribute[] serverStatusMetadata)
         {
-            return new ProcessAppServer(serviceTypeName, serverStatusMetadata, serviceProvider);
+            return new ProcessAppServer(serviceTypeName, serverStatusMetadata, ServiceProvider);
         }
     }
 
@@ -35,8 +34,9 @@ namespace SuperSocket.SocketEngine
         /// Initializes a new instance of the <see cref="ProcessBootstrap" /> class.
         /// </summary>
         /// <param name="config">The config.</param>
-        public ProcessBootstrap(IConfigurationSource config)
-            : base(config)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public ProcessBootstrap(IConfigurationSource config, IServiceProvider serviceProvider)
+            : base(config, serviceProvider)
         {
 #if !NETSTANDARD2_0
             var clientChannel = ChannelServices.RegisteredChannels.FirstOrDefault(c => c is IpcClientChannel);

@@ -25,27 +25,39 @@ namespace SuperSocket.SocketEngine
         /// Creates the bootstrap.
         /// </summary>
         /// <param name="config">The config.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public static IBootstrap CreateBootstrap(SocketBase.Config.IConfigurationSource config)
+        public static IBootstrap CreateBootstrap(
+            SocketBase.Config.IConfigurationSource config,
+            IServiceProvider serviceProvider)
         {
             if (config == null)
+            {
                 throw new ArgumentNullException("config");
+            }
 
             IBootstrap bootstrap;
 
             if (config.Isolation == IsolationMode.AppDomain)
-                bootstrap = new AppDomainBootstrap(config);
+            {
+                bootstrap = new AppDomainBootstrap(config, serviceProvider);
+            }
             else if (config.Isolation == IsolationMode.Process)
-                bootstrap = new ProcessBootstrap(config);
+            {
+                bootstrap = new ProcessBootstrap(config, serviceProvider);
+            }
             else
-                bootstrap = new DefaultBootstrap(config);
-
+            {
+                bootstrap = new DefaultBootstrap(config, serviceProvider);
+            }
 
 #if !NETSTANDARD2_0
             var section = config as ConfigurationSection;
 
             if (section != null)
+            {
                 ConfigurationWatcher.Watch(section, bootstrap);
+            }
 #endif
 
             return bootstrap;
@@ -62,16 +74,22 @@ namespace SuperSocket.SocketEngine
             var configSection = ConfigurationManager.GetSection("superSocket");
 
             if (configSection == null)//to keep compatible with old version
+            {
                 configSection = ConfigurationManager.GetSection("socketServer");
+            }
 
             if (configSection == null)
+            {
                 throw new ConfigurationErrorsException("Missing 'superSocket' or 'socketServer' configuration section.");
+            }
 
             var configSource = configSection as IConfigurationSource;
             if (configSource == null)
+            {
                 throw new ConfigurationErrorsException("Invalid 'superSocket' or 'socketServer' configuration section.");
+            }
 
-            return CreateBootstrap(configSource);
+            return CreateBootstrap(configSource, serviceProvider);
 #else
             var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";           
             return CreateBootstrapFromConfigFile(configFile, serviceProvider);
@@ -90,9 +108,11 @@ namespace SuperSocket.SocketEngine
             var configSource = ConfigurationManager.GetSection(configSectionName) as SocketBase.Config.IConfigurationSource;
 
             if (configSource == null)
+            {
                 throw new ArgumentException("Invalid section name.");
+            }
 
-            return CreateBootstrap(configSource);
+            return CreateBootstrap(configSource, serviceProvider);
 #else
 
             var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";         
@@ -121,9 +141,11 @@ namespace SuperSocket.SocketEngine
             var configSection = config.GetSection("superSocket");
 
             if (configSection == null)
+            {
                 configSection = config.GetSection("socketServer");
+            }
 
-            return CreateBootstrap(configSection as SocketBase.Config.IConfigurationSource);
+            return CreateBootstrap(configSection as SocketBase.Config.IConfigurationSource, serviceProvider);
 #else            
             IBootstrap bootstrap;
             var configurationRoot = serviceProvider.GetRequiredService<IConfigurationBuilder>()
@@ -134,9 +156,11 @@ namespace SuperSocket.SocketEngine
             var configSource = new ConfigurationSource(new SocketServiceConfig(string.IsNullOrEmpty(configSectionName) ? (IConfiguration)configurationRoot
                 : configurationRoot.GetSection(configSectionName)));
             if (configSource == null)
+            {
                 throw new InvalidOperationException("Invalid 'superSocket' or 'socketServer' configuration section.");
+            }
 
-            bootstrap = CreateBootstrap(configSource);
+            bootstrap = CreateBootstrap(configSource, serviceProvider);
 
             ChangeToken.OnChange(
                () => configurationRoot.GetReloadToken(),
@@ -159,15 +183,19 @@ namespace SuperSocket.SocketEngine
         {
             var configSource = new ConfigurationSource(new SocketServiceConfig(configurationRoot));
             if (configSource == null)
+            {
                 return;
-          
+            }
+
             foreach (var serverConfig in configSource.Servers)
             {
                 var server = bootstrap.AppServers.FirstOrDefault(x =>
                         x.Name.Equals(serverConfig.Name, StringComparison.OrdinalIgnoreCase));
 
                 if (server == null)
+                {
                     continue;
+                }
 
                 server.ReportPotentialConfigChange(new ServerConfig(serverConfig));
             }
@@ -178,7 +206,9 @@ namespace SuperSocket.SocketEngine
                 var logger = loggerProvider.Logger;
 
                 if (logger != null)
+                {
                     logger.Info("Configuraton reloaded!");
+                }
             }
         }
 #endif

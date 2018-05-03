@@ -18,8 +18,7 @@ namespace TelnetServer_05_StartByConfig
                 .BuildServiceProvider();
 
             var bootstrap = BootstrapFactory.CreateBootstrap(serviceProvider);
-            // TODO rgr doppelt übergeben?
-            if (!bootstrap.Initialize(serviceProvider))
+            if (!bootstrap.Initialize())
             {
                 Console.WriteLine("Failed to initialize!");
                 Console.ReadKey();

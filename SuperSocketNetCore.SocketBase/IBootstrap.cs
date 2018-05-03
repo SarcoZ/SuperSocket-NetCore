@@ -35,6 +35,11 @@ namespace SuperSocket.SocketBase
     public interface IBootstrap
     {
         /// <summary>
+        /// A container for service objects.
+        /// </summary>
+        IServiceProvider ServiceProvider { get; }
+
+        /// <summary>
         /// Gets all the app servers running in this bootstrap
         /// </summary>
         IEnumerable<IWorkItem> AppServers { get; }
@@ -47,47 +52,37 @@ namespace SuperSocket.SocketBase
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        bool Initialize(IServiceProvider serviceProvider);
-
+        bool Initialize();
 
         /// <summary>
         /// Initializes the bootstrap with a listen endpoint replacement dictionary
         /// </summary>
         /// <param name="listenEndPointReplacement">The listen end point replacement.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        bool Initialize(IDictionary<string, IPEndPoint> listenEndPointReplacement, IServiceProvider serviceProvider);
+        bool Initialize(IDictionary<string, IPEndPoint> listenEndPointReplacement);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, IServiceProvider serviceProvider);
-
+        bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <param name="logFactory">The log factory.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        bool Initialize(ILogFactory logFactory, IServiceProvider serviceProvider);
+        bool Initialize(ILogFactory logFactory);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
         /// <param name="logFactory">The log factory.</param>
-        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        bool Initialize(
-            Func<IServerConfig, IServerConfig> serverConfigResolver,
-            ILogFactory logFactory,
-            IServiceProvider serviceProvider);
+        bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory);
 
         /// <summary>
         /// Starts this bootstrap.

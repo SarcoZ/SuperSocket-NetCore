@@ -29,7 +29,6 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Null request info instance
         /// </summary>
-        // TODO rgr
         protected static readonly TRequestInfo NullRequestInfo = default(TRequestInfo);
 
         /// <summary>
