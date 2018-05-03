@@ -2,6 +2,8 @@
 using SuperSocket.SocketBase.Protocol;
 using System;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.Facility
 {
     /// <summary>
@@ -15,8 +17,9 @@ namespace SuperSocket.Facility
         /// Initializes a new instance of the <see cref="PolicyReceiveFilter"/> class.
         /// </summary>
         /// <param name="size">The size.</param>
-        public PolicyReceiveFilter(int size)
-            : base(size)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public PolicyReceiveFilter(int size, IServiceProvider serviceProvider)
+            : base(size, serviceProvider)
         {
 
         }
@@ -33,7 +36,7 @@ namespace SuperSocket.Facility
         {
             byte[] data = new byte[this.Size];
             Buffer.BlockCopy(buffer, offset, data, 0, data.Length);
-            return new BinaryRequestInfo(m_DefaultRequestInfoKey, data);
+            return new BinaryRequestInfo(m_DefaultRequestInfoKey, data, ServiceProvider.CreateScope());
         }
     }
 }

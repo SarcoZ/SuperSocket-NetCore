@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <Import Project="..\common.props" />
   <PropertyGroup>
     <PackageId>SuperSocketNetCore.Facility</PackageId>
@@ -7,5 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
   </ItemGroup>
 </Project>

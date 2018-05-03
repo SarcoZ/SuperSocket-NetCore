@@ -25,8 +25,9 @@ namespace SuperSocket.Facility.Protocol
         /// Initializes a new instance of the <see cref="FixedHeaderReceiveFilter&lt;TRequestInfo&gt;"/> class.
         /// </summary>
         /// <param name="headerSize">Size of the header.</param>
-        protected FixedHeaderReceiveFilter(int headerSize)
-            : base(headerSize)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected FixedHeaderReceiveFilter(int headerSize, IServiceProvider serviceProvider)
+            : base(headerSize, serviceProvider)
         {
 
         }

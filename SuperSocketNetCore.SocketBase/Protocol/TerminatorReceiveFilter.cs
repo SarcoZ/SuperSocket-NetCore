@@ -34,7 +34,9 @@ namespace SuperSocket.SocketBase.Protocol
         /// Initializes a new instance of the <see cref="TerminatorReceiveFilter&lt;TRequestInfo&gt;"/> class.
         /// </summary>
         /// <param name="terminator">The terminator.</param>
-        protected TerminatorReceiveFilter(byte[] terminator)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected TerminatorReceiveFilter(byte[] terminator, IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             m_SearchState = new SearchMarkState<byte>(terminator);
         }
@@ -229,8 +231,9 @@ namespace SuperSocket.SocketBase.Protocol
         /// </summary>
         /// <param name="terminator">The terminator.</param>
         /// <param name="encoding">The encoding.</param>
-        public TerminatorReceiveFilter(byte[] terminator, Encoding encoding)
-            : this(terminator, encoding, BasicRequestInfoParser.DefaultInstance)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public TerminatorReceiveFilter(byte[] terminator, Encoding encoding, IServiceProvider serviceProvider)
+            : this(terminator, encoding, new BasicRequestInfoParser(serviceProvider), serviceProvider)
         {
 
         }
@@ -240,8 +243,13 @@ namespace SuperSocket.SocketBase.Protocol
         /// <param name="terminator">The terminator.</param>
         /// <param name="encoding">The encoding.</param>
         /// <param name="requestParser">The request parser.</param>
-        public TerminatorReceiveFilter(byte[] terminator, Encoding encoding, IRequestInfoParser<StringRequestInfo> requestParser)
-            : base(terminator)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public TerminatorReceiveFilter(
+            byte[] terminator,
+            Encoding encoding,
+            IRequestInfoParser<StringRequestInfo> requestParser,
+            IServiceProvider serviceProvider)
+            : base(terminator, serviceProvider)
         {
             m_Encoding = encoding;
             m_RequestParser = requestParser;
@@ -257,7 +265,9 @@ namespace SuperSocket.SocketBase.Protocol
         protected override StringRequestInfo ProcessMatchedRequest(byte[] data, int offset, int length)
         {
             if (length == 0)
+            {
                 return m_RequestParser.ParseRequestInfo(string.Empty);
+            }
 
             return m_RequestParser.ParseRequestInfo(m_Encoding.GetString(data, offset, length));
         }

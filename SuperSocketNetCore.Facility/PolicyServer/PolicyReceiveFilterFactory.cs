@@ -32,7 +32,7 @@ namespace SuperSocket.Facility.PolicyServer
         /// <returns></returns>
         public IReceiveFilter<BinaryRequestInfo> CreateFilter(IAppServer appServer, IAppSession appSession, IPEndPoint remoteEndPoint)
         {
-            return new PolicyReceiveFilter(FixRequestSize);
+            return new PolicyReceiveFilter(FixRequestSize, appServer.ServiceProvider);
         }
     }
 }

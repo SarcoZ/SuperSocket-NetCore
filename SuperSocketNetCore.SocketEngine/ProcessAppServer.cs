@@ -50,8 +50,12 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="serverTypeName">Name of the server type.</param>
         /// <param name="serverStatusMetadata">The server status metadata.</param>
-        public ProcessAppServer(string serverTypeName, StatusInfoAttribute[] serverStatusMetadata)
-            : base(serverTypeName, serverStatusMetadata)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public ProcessAppServer(
+            string serverTypeName,
+            StatusInfoAttribute[] serverStatusMetadata,
+            IServiceProvider serviceProvider)
+            : base(serverTypeName, serverStatusMetadata, serviceProvider)
         {
 
         }

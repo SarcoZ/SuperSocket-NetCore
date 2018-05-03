@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
@@ -8,20 +10,19 @@ namespace SuperSocket.SocketBase.Protocol
     public class BasicRequestInfoParser : IRequestInfoParser<StringRequestInfo>
     {
         private readonly string m_Spliter;
+
+        private readonly IServiceProvider _serviceProvider;
+
         private readonly string[] m_ParameterSpliters;
 
         private const string m_OneSpace = " ";
 
         /// <summary>
-        /// The default singlegton instance
-        /// </summary>
-        public static readonly BasicRequestInfoParser DefaultInstance = new BasicRequestInfoParser();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BasicRequestInfoParser"/> class.
         /// </summary>
-        public BasicRequestInfoParser()
-            : this(m_OneSpace, m_OneSpace)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public BasicRequestInfoParser(IServiceProvider serviceProvider)
+            : this(m_OneSpace, m_OneSpace, serviceProvider)
         {
         }
 
@@ -30,13 +31,13 @@ namespace SuperSocket.SocketBase.Protocol
         /// </summary>
         /// <param name="spliter">The spliter between command name and command parameters.</param>
         /// <param name="parameterSpliter">The parameter spliter.</param>
-        public BasicRequestInfoParser(string spliter, string parameterSpliter)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public BasicRequestInfoParser(string spliter, string parameterSpliter, IServiceProvider serviceProvider)
         {
             m_Spliter = spliter;
+            _serviceProvider = serviceProvider;
             m_ParameterSpliters = new string[] { parameterSpliter };
         }
-
-        #region IRequestInfoParser<StringRequestInfo> Members
 
         /// <summary>
         /// Parses the request info.
@@ -61,9 +62,7 @@ namespace SuperSocket.SocketBase.Protocol
             }
 
             return new StringRequestInfo(name, param,
-                param.Split(m_ParameterSpliters, StringSplitOptions.RemoveEmptyEntries));
+                param.Split(m_ParameterSpliters, StringSplitOptions.RemoveEmptyEntries), _serviceProvider.CreateScope());
         }
-
-        #endregion
     }
 }

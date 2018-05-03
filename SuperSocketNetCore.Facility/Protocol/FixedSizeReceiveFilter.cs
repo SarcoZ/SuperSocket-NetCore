@@ -2,6 +2,8 @@
 using SuperSocket.SocketBase.Protocol;
 using System;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.Facility.Protocol
 {
     /// <summary>
@@ -11,6 +13,8 @@ namespace SuperSocket.Facility.Protocol
     public abstract class FixedSizeReceiveFilter<TRequestInfo> : IReceiveFilter<TRequestInfo>, IOffsetAdapter, IReceiveFilterInitializer
         where TRequestInfo : IRequestInfo
     {
+        protected IServiceProvider ServiceProvider { get; }
+
         private int m_ParsedLength;
 
         private int m_Size;
@@ -26,14 +30,17 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Null RequestInfo
         /// </summary>
+        // TODO rgr
         protected readonly static TRequestInfo NullRequestInfo = default(TRequestInfo);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FixedSizeReceiveFilter&lt;TRequestInfo&gt;"/> class.
         /// </summary>
         /// <param name="size">The size.</param>
-        protected FixedSizeReceiveFilter(int size)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected FixedSizeReceiveFilter(int size, IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
             m_Size = size;
         }
 

@@ -1,4 +1,5 @@
-﻿using SuperSocket.SocketBase.Protocol;
+﻿using System;
+using SuperSocket.SocketBase.Protocol;
 using System.Collections.Specialized;
 using System.Text;
 
@@ -29,8 +30,9 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpReceiveFilterBase&lt;TRequestInfo&gt;"/> class.
         /// </summary>
-        protected HttpReceiveFilterBase()
-            : base(NewLine)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected HttpReceiveFilterBase(IServiceProvider serviceProvider)
+            : base(NewLine, serviceProvider)
         {
 
         }

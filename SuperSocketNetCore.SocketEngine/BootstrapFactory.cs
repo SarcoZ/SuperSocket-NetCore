@@ -1,9 +1,12 @@
-﻿using SuperSocket.SocketBase;
+﻿using System;
+
+using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketEngine.Configuration;
-using System;
 using System.Linq;
 using System.Threading;
+
+using Microsoft.Extensions.DependencyInjection;
 #if !NETSTANDARD2_0
 using System.Configuration;
 #else
@@ -51,8 +54,9 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Creates the bootstrap from app configuration's socketServer section.
         /// </summary>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public static IBootstrap CreateBootstrap()
+        public static IBootstrap CreateBootstrap(IServiceProvider serviceProvider)
         {
 #if !NETSTANDARD2_0
             var configSection = ConfigurationManager.GetSection("superSocket");
@@ -70,7 +74,7 @@ namespace SuperSocket.SocketEngine
             return CreateBootstrap(configSource);
 #else
             var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";           
-            return CreateBootstrapFromConfigFile(configFile);
+            return CreateBootstrapFromConfigFile(configFile, serviceProvider);
 #endif
         }
 
@@ -78,8 +82,9 @@ namespace SuperSocket.SocketEngine
         /// Creates the bootstrap.
         /// </summary>
         /// <param name="configSectionName">Name of the config section.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public static IBootstrap CreateBootstrap(string configSectionName)
+        public static IBootstrap CreateBootstrap(string configSectionName, IServiceProvider serviceProvider)
         {
 #if !NETSTANDARD2_0
             var configSource = ConfigurationManager.GetSection(configSectionName) as SocketBase.Config.IConfigurationSource;
@@ -91,7 +96,7 @@ namespace SuperSocket.SocketEngine
 #else
 
             var configFile = System.Reflection.Assembly.GetCallingAssembly().GetName().Name + ".dll.config";         
-            return CreateBootstrapFromConfigFile(configFile, configSectionName);
+            return CreateBootstrapFromConfigFile(configFile, serviceProvider, configSectionName);
 #endif
         }
 
@@ -99,8 +104,13 @@ namespace SuperSocket.SocketEngine
         /// Creates the bootstrap from configuration file.
         /// </summary>
         /// <param name="configFile">The configuration file.</param>
+        /// <param name="configSectionName">Name of the config section.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public static IBootstrap CreateBootstrapFromConfigFile(string configFile, string configSectionName = "")
+        public static IBootstrap CreateBootstrapFromConfigFile(
+            string configFile,
+            IServiceProvider serviceProvider,
+            string configSectionName = "")
         {
 #if !NETSTANDARD2_0
             ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap();
@@ -116,7 +126,7 @@ namespace SuperSocket.SocketEngine
             return CreateBootstrap(configSection as SocketBase.Config.IConfigurationSource);
 #else            
             IBootstrap bootstrap;
-            var configurationRoot = new ConfigurationBuilder()
+            var configurationRoot = serviceProvider.GetRequiredService<IConfigurationBuilder>()
                         .SetBasePath(AppContext.BaseDirectory)
                         .AddXmlFile(configFile, optional: true, reloadOnChange: true)
                         .Build();

@@ -25,7 +25,9 @@ namespace SuperSocket.Facility.PolicyServer
         /// <summary>
         /// Initializes a new instance of the <see cref="PolicyServer"/> class.
         /// </summary>
-        public PolicyServer()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public PolicyServer(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }

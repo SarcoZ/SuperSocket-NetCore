@@ -20,9 +20,12 @@ namespace SuperSocket.SocketEngine
 
         }
 
-        protected override IWorkItem CreateWorkItemInstance(string serviceTypeName, StatusInfoAttribute[] serverStatusMetadata)
+        protected override IWorkItem CreateWorkItemInstance(
+            string serviceTypeName,
+            StatusInfoAttribute[] serverStatusMetadata,
+            IServiceProvider serviceProvider)
         {
-            return new ProcessAppServer(serviceTypeName, serverStatusMetadata);
+            return new ProcessAppServer(serviceTypeName, serverStatusMetadata, serviceProvider);
         }
     }
 

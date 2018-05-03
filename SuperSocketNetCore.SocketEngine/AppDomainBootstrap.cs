@@ -83,9 +83,12 @@ namespace SuperSocket.SocketEngine
             m_Bootstrap = bootstrap;
         }
 
-        protected override IWorkItem CreateWorkItemInstance(string serviceTypeName, StatusInfoAttribute[] serverStatusMetadata)
+        protected override IWorkItem CreateWorkItemInstance(
+            string serviceTypeName,
+            StatusInfoAttribute[] serverStatusMetadata,
+            IServiceProvider serviceProvider)
         {
-            return new AppDomainAppServer(serviceTypeName, serverStatusMetadata);
+            return new AppDomainAppServer(serviceTypeName, serverStatusMetadata, serviceProvider);
         }
 
         internal override bool SetupWorkItemInstance(IWorkItem workItem, WorkItemFactoryInfo factoryInfo)
@@ -189,40 +192,48 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public bool Initialize()
+        public bool Initialize(IServiceProvider serviceProvider)
         {
-            return m_InnerBootstrap.Initialize();
+            return m_InnerBootstrap.Initialize(serviceProvider);
         }
 
         /// <summary>
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
+        public bool Initialize(
+            Func<IServerConfig, IServerConfig> serverConfigResolver,
+            IServiceProvider serviceProvider)
         {
-            return m_InnerBootstrap.Initialize(serverConfigResolver);
+            return m_InnerBootstrap.Initialize(serverConfigResolver, serviceProvider);
         }
 
         /// <summary>
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="logFactory">The log factory.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public bool Initialize(ILogFactory logFactory)
+        public bool Initialize(ILogFactory logFactory, IServiceProvider serviceProvider)
         {
-            return m_InnerBootstrap.Initialize(logFactory);
+            return m_InnerBootstrap.Initialize(logFactory, serviceProvider);
         }
 
         /// <summary>
         /// Initializes the bootstrap with a listen endpoint replacement dictionary
         /// </summary>
         /// <param name="listenEndPointReplacement">The listen end point replacement.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public bool Initialize(IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement)
+        public bool Initialize(
+            IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement,
+            IServiceProvider serviceProvider)
         {
-            return m_InnerBootstrap.Initialize(listenEndPointReplacement);
+            return m_InnerBootstrap.Initialize(listenEndPointReplacement, serviceProvider);
         }
 
         /// <summary>
@@ -230,13 +241,17 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
         /// <param name="logFactory">The log factory.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory)
+        public bool Initialize(
+            Func<IServerConfig, IServerConfig> serverConfigResolver,
+            ILogFactory logFactory,
+            IServiceProvider serviceProvider)
         {
             if (logFactory != null)
                 throw new Exception("You cannot pass in logFactory, if your isolation level is AppDomain!");
 
-            return m_InnerBootstrap.Initialize(serverConfigResolver, logFactory);
+            return m_InnerBootstrap.Initialize(serverConfigResolver, logFactory, serviceProvider);
         }
 
         /// <summary>

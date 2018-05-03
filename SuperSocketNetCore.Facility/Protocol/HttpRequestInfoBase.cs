@@ -1,6 +1,8 @@
 ﻿using SuperSocket.SocketBase.Protocol;
 using System.Collections.Specialized;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.Facility.Protocol
 {
     /// <summary>
@@ -17,13 +19,8 @@ namespace SuperSocket.Facility.Protocol
     /// <summary>
     /// HttpRequestInfoBase
     /// </summary>
-    public abstract class HttpRequestInfoBase : IHttpRequestInfo
+    public abstract class HttpRequestInfoBase : RequestInfoBase, IHttpRequestInfo
     {
-        /// <summary>
-        /// Gets the key of this request.
-        /// </summary>
-        public string Key { get; private set; }
-
         /// <summary>
         /// Gets the http header.
         /// </summary>
@@ -34,7 +31,9 @@ namespace SuperSocket.Facility.Protocol
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="header">The header.</param>
-        protected HttpRequestInfoBase(string key, NameValueCollection header)
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        protected HttpRequestInfoBase(string key, NameValueCollection header, IServiceScope serviceScope)
+            : base(serviceScope)
         {
             Key = key;
             Header = header;
@@ -58,8 +57,13 @@ namespace SuperSocket.Facility.Protocol
         /// <param name="key">The key.</param>
         /// <param name="header">The header.</param>
         /// <param name="body">The body.</param>
-        protected HttpRequestInfoBase(string key, NameValueCollection header, TRequestBody body)
-            : base(key, header)
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        protected HttpRequestInfoBase(
+            string key,
+            NameValueCollection header,
+            TRequestBody body,
+            IServiceScope serviceScope)
+            : base(key, header, serviceScope)
         {
             Body = body;
         }

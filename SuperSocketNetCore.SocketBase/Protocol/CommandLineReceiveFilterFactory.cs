@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace SuperSocket.SocketBase.Protocol
 {
@@ -10,8 +11,9 @@ namespace SuperSocket.SocketBase.Protocol
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineReceiveFilterFactory"/> class.
         /// </summary>
-        public CommandLineReceiveFilterFactory()
-            : this(Encoding.ASCII)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public CommandLineReceiveFilterFactory(IServiceProvider serviceProvider)
+            : this(Encoding.ASCII, serviceProvider)
         {
 
         }
@@ -20,8 +22,9 @@ namespace SuperSocket.SocketBase.Protocol
         /// Initializes a new instance of the <see cref="CommandLineReceiveFilterFactory"/> class.
         /// </summary>
         /// <param name="encoding">The encoding.</param>
-        public CommandLineReceiveFilterFactory(Encoding encoding)
-            : this(encoding, new BasicRequestInfoParser())
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public CommandLineReceiveFilterFactory(Encoding encoding, IServiceProvider serviceProvider)
+            : this(encoding, new BasicRequestInfoParser(serviceProvider))
         {
 
         }

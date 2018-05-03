@@ -24,14 +24,17 @@ namespace SuperSocket.SocketEngine
 
         protected IWorkItemBase AppServer { get; private set; }
 
+        public IServiceProvider ServiceProvider { get; }
+
         public string Name { get; private set; }
 
         private StatusInfoAttribute[] m_ServerStatusMetadata;
 
         private AutoResetEvent m_StopResetEvent = new AutoResetEvent(false);
 
-        protected IsolationAppServer(string serverTypeName, StatusInfoAttribute[] serverStatusMetadata)
+        protected IsolationAppServer(string serverTypeName, StatusInfoAttribute[] serverStatusMetadata, IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
             State = ServerState.NotInitialized;
             ServerTypeName = serverTypeName;
             m_ServerStatusMetadata = PrepareStatusMetadata(serverStatusMetadata);
@@ -103,7 +106,7 @@ namespace SuperSocket.SocketEngine
                     true,
                     BindingFlags.CreateInstance,
                     null,
-                    new object[] { currentDomain.BaseDirectory },
+                    new object[] { currentDomain.BaseDirectory, ServiceProvider },
                     null,
                     new object[0]);
 #else

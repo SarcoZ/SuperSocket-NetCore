@@ -3,7 +3,7 @@
         <PackageTags>SuperSocket, SuperSocketNetCore Socket Server, .Net Socket Server Framework</PackageTags>
         <Description>This is a .net core compatible fork of SuperSocket. SuperSocket is a light weight, cross platform and extensible socket server application framework. You can use it to build a server side socket application (like game server, GPS server, industrial control system, data acquisition server etc) easily without thinking about how to use socket, how to maintain the socket connections and how socket works.</Description>
         <Authors>Kerry Jiang;Sarco</Authors>
-        <TargetFrameworks>netstandard2.0;net40;net45;net451;net452</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
         <VersionPrefix>2.0.0</VersionPrefix>
         <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
         <PackageProjectUrl>http://www.supersocket.net/</PackageProjectUrl>

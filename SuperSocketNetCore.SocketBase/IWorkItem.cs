@@ -1,4 +1,6 @@
-﻿using SuperSocket.SocketBase.Config;
+﻿using System;
+
+using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketBase.Provider;
 
 namespace SuperSocket.SocketBase
@@ -8,6 +10,11 @@ namespace SuperSocket.SocketBase
     /// </summary>
     public interface IWorkItemBase : IStatusInfoSource, ISystemEndPoint
     {
+        /// <summary>
+        /// A container for service objects.
+        /// </summary>
+        IServiceProvider ServiceProvider { get; }
+
         /// <summary>
         /// Gets the name.
         /// </summary>

@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocketNetCore.Dlr", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocketNetCore.Facility", "SuperSocketNetCore.Facility\SuperSocketNetCore.Facility.csproj", "{2E1E49C1-4525-4674-BECC-BC670314B255}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelnetServer_05_StartByConfig", "TelnetServer_05_StartByConfig\TelnetServer_05_StartByConfig.csproj", "{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelnetServer_05_StartByConfig", "TelnetServer_05_StartByConfig\TelnetServer_05_StartByConfig.csproj", "{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocketNetCore", "SuperSocketNetCore\SuperSocketNetCore.csproj", "{F7E6AF8F-F950-4CFA-B61F-1823DAD127D5}"
 EndProject

@@ -1,4 +1,6 @@
-﻿namespace SuperSocket.SocketBase.Protocol
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
     /// String type request information
@@ -11,8 +13,9 @@
         /// <param name="key">The key.</param>
         /// <param name="body">The body.</param>
         /// <param name="parameters">The parameters.</param>
-        public StringRequestInfo(string key, string body, string[] parameters)
-            : base(key, body)
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        public StringRequestInfo(string key, string body, string[] parameters, IServiceScope serviceScope)
+            : base(key, body, serviceScope)
         {
             Parameters = parameters;
         }

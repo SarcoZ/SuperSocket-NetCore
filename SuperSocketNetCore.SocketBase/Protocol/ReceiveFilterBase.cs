@@ -1,4 +1,6 @@
-﻿using SuperSocket.Common;
+﻿using System;
+
+using SuperSocket.Common;
 
 namespace SuperSocket.SocketBase.Protocol
 {
@@ -9,6 +11,8 @@ namespace SuperSocket.SocketBase.Protocol
     public abstract class ReceiveFilterBase<TRequestInfo> : IReceiveFilter<TRequestInfo>
         where TRequestInfo : IRequestInfo
     {
+        protected IServiceProvider ServiceProvider { get; }
+
         private ArraySegmentList m_BufferSegments;
 
         /// <summary>
@@ -22,8 +26,10 @@ namespace SuperSocket.SocketBase.Protocol
         /// <summary>
         /// Initializes a new instance of the <see cref="ReceiveFilterBase&lt;TRequestInfo&gt;"/> class.
         /// </summary>
-        protected ReceiveFilterBase()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected ReceiveFilterBase(IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
             m_BufferSegments = new ArraySegmentList();
         }
 
@@ -44,9 +50,6 @@ namespace SuperSocket.SocketBase.Protocol
         {
             m_BufferSegments = previousRequestFilter.BufferSegments;
         }
-
-        #region IReceiveFilter<TRequestInfo> Members
-
 
         /// <summary>
         /// Filters received data of the specific session into request info.
@@ -78,8 +81,6 @@ namespace SuperSocket.SocketBase.Protocol
         /// The next Receive filter.
         /// </value>
         public IReceiveFilter<TRequestInfo> NextReceiveFilter { get; protected set; }
-
-        #endregion
 
         /// <summary>
         /// Adds the array segment.

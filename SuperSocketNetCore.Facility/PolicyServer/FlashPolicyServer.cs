@@ -10,7 +10,9 @@ namespace SuperSocket.Facility.PolicyServer
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashPolicyServer"/> class.
         /// </summary>
-        public FlashPolicyServer()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public FlashPolicyServer(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }

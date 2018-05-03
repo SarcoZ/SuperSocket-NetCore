@@ -16,8 +16,9 @@ namespace SuperSocket.SocketBase
         /// <summary>
         /// Initializes a new instance of the <see cref="AppServer"/> class.
         /// </summary>
-        public AppServer()
-            : base()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public AppServer(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }
@@ -26,8 +27,11 @@ namespace SuperSocket.SocketBase
         /// Initializes a new instance of the <see cref="AppServer"/> class.
         /// </summary>
         /// <param name="receiveFilterFactory">The Receive filter factory.</param>
-        public AppServer(IReceiveFilterFactory<StringRequestInfo> receiveFilterFactory)
-            : base(receiveFilterFactory)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public AppServer(
+            IReceiveFilterFactory<StringRequestInfo> receiveFilterFactory,
+            IServiceProvider serviceProvider)
+            : base(receiveFilterFactory, serviceProvider)
         {
 
         }
@@ -43,8 +47,9 @@ namespace SuperSocket.SocketBase
         /// <summary>
         /// Initializes a new instance of the <see cref="AppServer&lt;TAppSession&gt;"/> class.
         /// </summary>
-        public AppServer()
-            : base()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public AppServer(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }
@@ -53,15 +58,18 @@ namespace SuperSocket.SocketBase
         /// Initializes a new instance of the <see cref="AppServer&lt;TAppSession&gt;"/> class.
         /// </summary>
         /// <param name="receiveFilterFactory">The Receive filter factory.</param>
-        public AppServer(IReceiveFilterFactory<StringRequestInfo> receiveFilterFactory)
-            : base(receiveFilterFactory)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public AppServer(
+            IReceiveFilterFactory<StringRequestInfo> receiveFilterFactory,
+            IServiceProvider serviceProvider)
+            : base(receiveFilterFactory, serviceProvider)
         {
 
         }
 
         internal override IReceiveFilterFactory<StringRequestInfo> CreateDefaultReceiveFilterFactory()
         {
-            return new CommandLineReceiveFilterFactory(TextEncoding);
+            return new CommandLineReceiveFilterFactory(TextEncoding, ((IWorkItem)this).ServiceProvider);
         }
     }
 
@@ -78,8 +86,9 @@ namespace SuperSocket.SocketBase
         /// <summary>
         /// Initializes a new instance of the <see cref="AppServer&lt;TAppSession, TRequestInfo&gt;"/> class.
         /// </summary>
-        public AppServer()
-            : base()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public AppServer(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }
@@ -88,8 +97,9 @@ namespace SuperSocket.SocketBase
         /// Initializes a new instance of the <see cref="AppServer&lt;TAppSession, TRequestInfo&gt;"/> class.
         /// </summary>
         /// <param name="protocol">The protocol.</param>
-        protected AppServer(IReceiveFilterFactory<TRequestInfo> protocol)
-            : base(protocol)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected AppServer(IReceiveFilterFactory<TRequestInfo> protocol, IServiceProvider serviceProvider)
+            : base(protocol, serviceProvider)
         {
 
         }

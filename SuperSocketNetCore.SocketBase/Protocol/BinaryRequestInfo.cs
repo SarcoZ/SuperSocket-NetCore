@@ -1,4 +1,6 @@
-﻿namespace SuperSocket.SocketBase.Protocol
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
     /// Binary type request information
@@ -10,8 +12,9 @@
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="body">The body.</param>
-        public BinaryRequestInfo(string key, byte[] body)
-            : base(key, body)
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        public BinaryRequestInfo(string key, byte[] body, IServiceScope serviceScope)
+            : base(key, body, serviceScope)
         {
 
         }

@@ -1,15 +1,19 @@
-﻿namespace SuperSocket.SocketBase.Protocol
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
     /// RequestInfo basic class
     /// </summary>
     /// <typeparam name="TRequestBody">The type of the request body.</typeparam>
-    public class RequestInfo<TRequestBody> : IRequestInfo<TRequestBody>
+    public abstract class RequestInfo<TRequestBody> : RequestInfoBase, IRequestInfo<TRequestBody>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RequestInfo&lt;TRequestBody&gt;"/> class.
         /// </summary>
-        protected RequestInfo()
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        protected RequestInfo(IServiceScope serviceScope)
+            : base(serviceScope)
         {
 
         }
@@ -19,7 +23,9 @@
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="body">The body.</param>
-        public RequestInfo(string key, TRequestBody body)
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        public RequestInfo(string key, TRequestBody body, IServiceScope serviceScope)
+            : this(serviceScope)
         {
             Initialize(key, body);
         }
@@ -38,7 +44,7 @@
         /// <summary>
         /// Gets the key of this request.
         /// </summary>
-        public string Key { get; private set; }
+        public override string Key { get; protected set; }
 
         /// <summary>
         /// Gets the body.
@@ -51,12 +57,14 @@
     /// </summary>
     /// <typeparam name="TRequestHeader">The type of the request header.</typeparam>
     /// <typeparam name="TRequestBody">The type of the request body.</typeparam>
-    public class RequestInfo<TRequestHeader, TRequestBody> : RequestInfo<TRequestBody>, IRequestInfo<TRequestHeader, TRequestBody>
+    public abstract class RequestInfo<TRequestHeader, TRequestBody> : RequestInfo<TRequestBody>, IRequestInfo<TRequestHeader, TRequestBody>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RequestInfo&lt;TRequestHeader, TRequestBody&gt;"/> class.
         /// </summary>
-        public RequestInfo()
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        public RequestInfo(IServiceScope serviceScope)
+            : base(serviceScope)
         {
 
         }
@@ -66,8 +74,9 @@
         /// <param name="key">The key.</param>
         /// <param name="header">The header.</param>
         /// <param name="body">The body.</param>
-        public RequestInfo(string key, TRequestHeader header, TRequestBody body)
-            : base(key, body)
+        /// <param name="serviceScope">A container for service objects with a scope for this request.</param>
+        public RequestInfo(string key, TRequestHeader header, TRequestBody body, IServiceScope serviceScope)
+            : base(key, body, serviceScope)
         {
             Header = header;
         }

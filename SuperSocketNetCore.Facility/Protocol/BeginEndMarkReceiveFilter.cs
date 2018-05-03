@@ -26,7 +26,9 @@ namespace SuperSocket.Facility.Protocol
         /// </summary>
         /// <param name="beginMark">The begin mark.</param>
         /// <param name="endMark">The end mark.</param>
-        protected BeginEndMarkReceiveFilter(byte[] beginMark, byte[] endMark)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected BeginEndMarkReceiveFilter(byte[] beginMark, byte[] endMark, IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             m_BeginSearchState = new SearchMarkState<byte>(beginMark);
             m_EndSearchState = new SearchMarkState<byte>(endMark);

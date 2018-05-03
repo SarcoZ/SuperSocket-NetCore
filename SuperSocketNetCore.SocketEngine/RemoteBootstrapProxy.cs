@@ -26,6 +26,8 @@ namespace SuperSocket.SocketEngine
                 get { return m_Server.State; }
             }
 
+            public IServiceProvider ServiceProvider => m_Server.ServiceProvider;
+
             public string Name
             {
                 get { return m_Server.Name; }
@@ -102,27 +104,27 @@ namespace SuperSocket.SocketEngine
             get { return m_Bootstrap.Config; }
         }
 
-        public bool Initialize()
+        public bool Initialize(IServiceProvider serviceProvider)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement)
+        public bool Initialize(IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement, IServiceProvider serviceProvider)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
+        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, IServiceProvider serviceProvider)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(ILogFactory logFactory)
+        public bool Initialize(ILogFactory logFactory, IServiceProvider serviceProvider)
         {
             throw new NotSupportedException();
         }
 
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory)
+        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory, IServiceProvider serviceProvider)
         {
             throw new NotSupportedException();
         }

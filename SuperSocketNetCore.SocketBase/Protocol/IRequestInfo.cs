@@ -7,12 +7,18 @@ namespace SuperSocket.SocketBase.Protocol
     /// <summary>
     /// Request information interface
     /// </summary>
-    public interface IRequestInfo
+    /// <remarks>You need to dispose the RequestInfo objects.</remarks>
+    public interface IRequestInfo : IDisposable
     {
         /// <summary>
         /// Gets the key of this request.
         /// </summary>
         string Key { get; }
+
+        /// <summary>
+        /// A container for service objects with a scope for this request.
+        /// </summary>
+        IServiceProvider ServiceProvider { get; }
     }
 
     /// <summary>

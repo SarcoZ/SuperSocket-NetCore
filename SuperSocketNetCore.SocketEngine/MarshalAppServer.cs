@@ -4,6 +4,8 @@ using SuperSocket.SocketBase.Metadata;
 using SuperSocket.SocketBase.Provider;
 using System;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.SocketEngine
 {
     class MarshalAppServer : MarshalByRefObject, IWorkItem, IStatusInfoSource
@@ -14,11 +16,14 @@ namespace SuperSocket.SocketEngine
         /// Initializes a new instance of the <see cref="AppDomainAppServer"/> class.
         /// </summary>
         /// <param name="serviceTypeName">Name of the service type.</param>
-        public MarshalAppServer(string serviceTypeName)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public MarshalAppServer(string serviceTypeName, IServiceProvider serviceProvider)
         {
             var serviceType = Type.GetType(serviceTypeName);
-            m_AppServer = (IWorkItem)Activator.CreateInstance(serviceType);
+            m_AppServer = (IWorkItem)ActivatorUtilities.CreateInstance(serviceProvider, serviceType);
         }
+
+        public IServiceProvider ServiceProvider => m_AppServer.ServiceProvider;
 
         /// <summary>
         /// Gets the name of the server instance.

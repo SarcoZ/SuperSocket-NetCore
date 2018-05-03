@@ -69,9 +69,12 @@ namespace SuperSocket.Facility.Protocol
         /// <param name="appSession">The app session.</param>
         /// <param name="remoteEndPoint">The remote end point.</param>
         /// <returns></returns>
-        public IReceiveFilter<StringRequestInfo> CreateFilter(IAppServer appServer, IAppSession appSession, IPEndPoint remoteEndPoint)
+        public IReceiveFilter<StringRequestInfo> CreateFilter(
+            IAppServer appServer,
+            IAppSession appSession,
+            IPEndPoint remoteEndPoint)
         {
-            return new CountSpliterReceiveFilter(m_Spliter, m_SpliterCount);
+            return new CountSpliterReceiveFilter(m_Spliter, m_SpliterCount, appServer.ServiceProvider);
         }
     }
 }

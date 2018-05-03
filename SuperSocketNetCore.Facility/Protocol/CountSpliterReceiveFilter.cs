@@ -2,6 +2,8 @@
 using System;
 using System.Text;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.Facility.Protocol
 {
     /// <summary>
@@ -14,6 +16,8 @@ namespace SuperSocket.Facility.Protocol
     public abstract class CountSpliterReceiveFilter<TRequestInfo> : IReceiveFilter<TRequestInfo>, IOffsetAdapter
         where TRequestInfo : IRequestInfo
     {
+        protected IServiceProvider ServiceProvider { get; }
+
         private int m_Total;
 
         private int m_SpliterFoundCount;
@@ -25,6 +29,7 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Null request info instance
         /// </summary>
+        // TODO rgr
         protected static readonly TRequestInfo NullRequestInfo = default(TRequestInfo);
 
         /// <summary>
@@ -32,8 +37,10 @@ namespace SuperSocket.Facility.Protocol
         /// </summary>
         /// <param name="spliter">The spliter.</param>
         /// <param name="spliterCount">The spliter count.</param>
-        protected CountSpliterReceiveFilter(byte spliter, int spliterCount)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        protected CountSpliterReceiveFilter(byte spliter, int spliterCount, IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
             m_Spliter = spliter;
             m_SpliterCount = spliterCount;
         }
@@ -181,8 +188,9 @@ namespace SuperSocket.Facility.Protocol
         /// </summary>
         /// <param name="spliter">The spliter.</param>
         /// <param name="spliterCount">The spliter count.</param>
-        public CountSpliterReceiveFilter(byte spliter, int spliterCount)
-            : this(spliter, spliterCount, Encoding.ASCII)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public CountSpliterReceiveFilter(byte spliter, int spliterCount, IServiceProvider serviceProvider)
+            : this(spliter, spliterCount, Encoding.ASCII, serviceProvider)
         {
 
         }
@@ -193,8 +201,13 @@ namespace SuperSocket.Facility.Protocol
         /// <param name="spliter">The spliter.</param>
         /// <param name="spliterCount">The spliter count.</param>
         /// <param name="encoding">The encoding.</param>
-        public CountSpliterReceiveFilter(byte spliter, int spliterCount, Encoding encoding)
-            : this(spliter, spliterCount, encoding, 0)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public CountSpliterReceiveFilter(
+            byte spliter,
+            int spliterCount,
+            Encoding encoding,
+            IServiceProvider serviceProvider)
+            : this(spliter, spliterCount, encoding, 0, serviceProvider)
         {
 
         }
@@ -206,8 +219,14 @@ namespace SuperSocket.Facility.Protocol
         /// <param name="spliterCount">The spliter count.</param>
         /// <param name="encoding">The encoding.</param>
         /// <param name="keyIndex">Index of the key.</param>
-        public CountSpliterReceiveFilter(byte spliter, int spliterCount, Encoding encoding, int keyIndex)
-            : base(spliter, spliterCount)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public CountSpliterReceiveFilter(
+            byte spliter,
+            int spliterCount,
+            Encoding encoding,
+            int keyIndex,
+            IServiceProvider serviceProvider)
+            : base(spliter, spliterCount, serviceProvider)
         {
             m_Encoding = encoding;
             m_KeyIndex = keyIndex;
@@ -226,7 +245,7 @@ namespace SuperSocket.Facility.Protocol
             //ignore the first and the last spliter
             var body = m_Encoding.GetString(readBuffer, offset + 1, length - 2);
             var array = body.Split(m_Spliter);
-            return new StringRequestInfo(array[m_KeyIndex], body, array);
+            return new StringRequestInfo(array[m_KeyIndex], body, array, ServiceProvider.CreateScope());
         }
     }
 }

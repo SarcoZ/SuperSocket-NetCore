@@ -1,4 +1,6 @@
-﻿namespace SuperSocket.Facility.PolicyServer
+﻿using System;
+
+namespace SuperSocket.Facility.PolicyServer
 {
     /// <summary>
     /// Silverlight policy AppServer
@@ -8,8 +10,9 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="SilverlightPolicyServer"/> class.
         /// </summary>
-        public SilverlightPolicyServer()
-            : base()
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public SilverlightPolicyServer(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }

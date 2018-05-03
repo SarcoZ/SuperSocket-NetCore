@@ -15,6 +15,8 @@ using System.Runtime.Remoting.Channels.Ipc;
 #endif
 using System.Runtime.Serialization.Formatters;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.SocketEngine
 {
     /// <summary>
@@ -223,11 +225,15 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="serviceTypeName">Name of the service type.</param>
         /// <param name="serverStatusMetadata">The server status metadata.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        protected virtual IWorkItem CreateWorkItemInstance(string serviceTypeName, StatusInfoAttribute[] serverStatusMetadata)
+        protected virtual IWorkItem CreateWorkItemInstance(
+            string serviceTypeName,
+            StatusInfoAttribute[] serverStatusMetadata,
+            IServiceProvider serviceProvider)
         {
             var serviceType = Type.GetType(serviceTypeName, true);
-            return Activator.CreateInstance(serviceType) as IWorkItem;
+            return ActivatorUtilities.CreateInstance(serviceProvider, serviceType) as IWorkItem;
         }
 
         internal virtual bool SetupWorkItemInstance(IWorkItem workItem, WorkItemFactoryInfo factoryInfo)
@@ -264,13 +270,19 @@ namespace SuperSocket.SocketEngine
         /// Initializes the bootstrap with a listen endpoint replacement dictionary
         /// </summary>
         /// <param name="listenEndPointReplacement">The listen end point replacement.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(IDictionary<string, IPEndPoint> listenEndPointReplacement)
+        public virtual bool Initialize(
+            IDictionary<string, IPEndPoint> listenEndPointReplacement,
+            IServiceProvider serviceProvider)
         {
-            return Initialize((c) => ReplaceListenEndPoint(c, listenEndPointReplacement));
+            return Initialize((c) => ReplaceListenEndPoint(c, listenEndPointReplacement, serviceProvider), serviceProvider);
         }
 
-        private IServerConfig ReplaceListenEndPoint(IServerConfig serverConfig, IDictionary<string, IPEndPoint> listenEndPointReplacement)
+        private IServerConfig ReplaceListenEndPoint(
+            IServerConfig serverConfig,
+            IDictionary<string, IPEndPoint> listenEndPointReplacement,
+            IServiceProvider serviceProvider)
         {
             var config = new ServerConfig(serverConfig);
 
@@ -316,13 +328,16 @@ namespace SuperSocket.SocketEngine
             return config;
         }
 
-        private IWorkItem InitializeAndSetupWorkItem(WorkItemFactoryInfo factoryInfo)
+        private IWorkItem InitializeAndSetupWorkItem(WorkItemFactoryInfo factoryInfo, IServiceProvider serviceProvider)
         {
             IWorkItem appServer;
 
             try
             {
-                appServer = CreateWorkItemInstance(factoryInfo.ServerType, factoryInfo.StatusInfoMetadata);
+                appServer = CreateWorkItemInstance(
+                    factoryInfo.ServerType,
+                    factoryInfo.StatusInfoMetadata,
+                    serviceProvider);
 
                 if (m_GlobalLog.IsDebugEnabled)
                     m_GlobalLog.DebugFormat("The server instance {0} has been created!", factoryInfo.Config.Name);
@@ -372,8 +387,12 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
         /// <param name="logFactory">The log factory.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver, ILogFactory logFactory)
+        public virtual bool Initialize(
+            Func<IServerConfig, IServerConfig> serverConfigResolver,
+            ILogFactory logFactory,
+            IServiceProvider serviceProvider)
         {
             if (m_Initialized)
                 throw new Exception("The server had been initialized already, you cannot initialize it again!");
@@ -416,7 +435,7 @@ namespace SuperSocket.SocketEngine
             //Initialize servers
             foreach (var factoryInfo in workItemFactories)
             {
-                IWorkItem appServer = InitializeAndSetupWorkItem(factoryInfo);
+                IWorkItem appServer = InitializeAndSetupWorkItem(factoryInfo, serviceProvider);
 
                 if (appServer == null)
                     return false;
@@ -480,29 +499,34 @@ namespace SuperSocket.SocketEngine
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
+        public virtual bool Initialize(
+            Func<IServerConfig, IServerConfig> serverConfigResolver,
+            IServiceProvider serviceProvider)
         {
-            return Initialize(serverConfigResolver, null);
+            return Initialize(serverConfigResolver, null, serviceProvider);
         }
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <param name="logFactory">The log factory.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize(ILogFactory logFactory)
+        public virtual bool Initialize(ILogFactory logFactory, IServiceProvider serviceProvider)
         {
-            return Initialize(c => c, logFactory);
+            return Initialize(c => c, logFactory, serviceProvider);
         }
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public virtual bool Initialize()
+        public virtual bool Initialize(IServiceProvider serviceProvider)
         {
-            return Initialize(c => c);
+            return Initialize(c => c, serviceProvider);
         }
 
         /// <summary>

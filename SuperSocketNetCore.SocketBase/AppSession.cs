@@ -515,6 +515,7 @@ namespace SuperSocket.SocketBase
                 rest = 0;
                 offsetDelta = 0;
                 Close(CloseReason.ProtocolError);
+                requestInfo?.Dispose();
                 return null;
             }
 
@@ -541,6 +542,7 @@ namespace SuperSocket.SocketBase
                     Logger.Error(this, string.Format("Max request length: {0}, current processed length: {1}", maxRequestLength, currentRequestLength));
 
                 Close(CloseReason.ProtocolError);
+                requestInfo?.Dispose();
                 return null;
             }
 

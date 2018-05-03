@@ -116,7 +116,10 @@ namespace SuperSocket.SocketEngine
             catch (Exception exc)
             {
                 if (AppServer.Logger.IsErrorEnabled)
+                {
                     AppServer.Logger.Error("Failed to parse UDP package!", exc);
+                }
+
                 return;
             }
 
@@ -125,21 +128,33 @@ namespace SuperSocket.SocketEngine
             if (rest > 0)
             {
                 if (AppServer.Logger.IsErrorEnabled)
+                {
                     AppServer.Logger.Error("The output parameter rest must be zero in this case!");
+                }
+
+                requestInfo?.Dispose();
                 return;
             }
 
             if (udpRequestInfo == null)
             {
                 if (AppServer.Logger.IsErrorEnabled)
+                {
                     AppServer.Logger.Error("Invalid UDP package format!");
+                }
+                
+                requestInfo?.Dispose();
                 return;
             }
 
             if (string.IsNullOrEmpty(udpRequestInfo.SessionID))
             {
                 if (AppServer.Logger.IsErrorEnabled)
+                {
                     AppServer.Logger.Error("Failed to get session key from UDP package!");
+                }
+
+                requestInfo?.Dispose();
                 return;
             }
 
@@ -153,7 +168,10 @@ namespace SuperSocket.SocketEngine
 
                 //Failed to create a new session
                 if (appSession == null)
+                {
+                    requestInfo?.Dispose();
                     return;
+                }
             }
             else
             {

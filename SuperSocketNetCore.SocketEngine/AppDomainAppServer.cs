@@ -17,8 +17,12 @@ namespace SuperSocket.SocketEngine
         /// </summary>
         /// <param name="serverTypeName">Name of the server type.</param>
         /// <param name="serverStatusMetadata">The server status metadata.</param>
-        public AppDomainAppServer(string serverTypeName, StatusInfoAttribute[] serverStatusMetadata)
-            : base(serverTypeName, serverStatusMetadata)
+        /// <param name="serviceProvider">A container for service objects.</param>
+        public AppDomainAppServer(
+            string serverTypeName,
+            StatusInfoAttribute[] serverStatusMetadata,
+            IServiceProvider serviceProvider)
+            : base(serverTypeName, serverStatusMetadata, serviceProvider)
         {
 
         }
@@ -43,14 +47,15 @@ namespace SuperSocket.SocketEngine
 
 
 #if !NETSTANDARD2_0
-                appServer = (IWorkItem)m_HostDomain.CreateInstanceAndUnwrap(marshalServerType.Assembly.FullName,
-                        marshalServerType.FullName,
-                        true,
-                        BindingFlags.CreateInstance,
-                        null,
-                        new object[] { ServerTypeName },
-                        null,
-                        new object[0]);
+                appServer = (IWorkItem)m_HostDomain.CreateInstanceAndUnwrap(
+                        assemblyName: marshalServerType.Assembly.FullName,
+                        typeName: marshalServerType.FullName,
+                        ignoreCase: true,
+                        bindingAttr: BindingFlags.CreateInstance,
+                        binder: null,
+                        args: new object[] { ServerTypeName, ServiceProvider },
+                        culture: null,
+                        activationAttributes: new object[0]);
 #else
                 //TODO
                 appServer = (IWorkItem)m_HostDomain.InitializeLifetimeService();
