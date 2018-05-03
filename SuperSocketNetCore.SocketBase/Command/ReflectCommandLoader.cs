@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.SocketBase.Command
 {
     /// <summary>
@@ -39,8 +41,9 @@ namespace SuperSocket.SocketBase.Command
         /// Tries to load commands.
         /// </summary>
         /// <param name="commands">The commands.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public override bool TryLoadCommands(out IEnumerable<TCommand> commands)
+        public override bool TryLoadCommands(out IEnumerable<TCommand> commands, IServiceProvider serviceProvider)
         {
             commands = null;
 
@@ -89,7 +92,9 @@ namespace SuperSocket.SocketBase.Command
             {
                 try
                 {
-                    outputCommands.AddRange(assembly.GetImplementedObjectsByInterface<TCommand>());
+                    var typesToActivate = assembly.GetImplementedTypesByInterface<TCommand>();
+                    outputCommands.AddRange(
+                        typesToActivate.Select(typeToActivate => (TCommand)ActivatorUtilities.CreateInstance(serviceProvider, typeToActivate)));
                 }
                 catch (Exception exc)
                 {

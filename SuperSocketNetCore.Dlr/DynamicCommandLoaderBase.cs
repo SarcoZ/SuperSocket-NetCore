@@ -130,8 +130,9 @@ namespace SuperSocket.Dlr
         /// Tries to load commands.
         /// </summary>
         /// <param name="commands">The commands.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public override bool TryLoadCommands(out IEnumerable<TCommand> commands)
+        public override bool TryLoadCommands(out IEnumerable<TCommand> commands, IServiceProvider serviceProvider)
         {
             var outputCommands = new List<TCommand>();
 

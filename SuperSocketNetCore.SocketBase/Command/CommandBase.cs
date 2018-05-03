@@ -11,19 +11,12 @@ namespace SuperSocket.SocketBase.Command
         where TAppSession : IAppSession, IAppSession<TAppSession, TRequestInfo>, new()
         where TRequestInfo : IRequestInfo
     {
-
-        #region ICommand<TAppSession,TRequestInfo> Members
-
         /// <summary>
         /// Executes the command.
         /// </summary>
         /// <param name="session">The session.</param>
         /// <param name="requestInfo">The request info.</param>
         public abstract void ExecuteCommand(TAppSession session, TRequestInfo requestInfo);
-
-        #endregion
-
-        #region ICommand Members
 
         /// <summary>
         /// Gets the name.
@@ -32,8 +25,6 @@ namespace SuperSocket.SocketBase.Command
         {
             get { return GetType().Name; }
         }
-
-        #endregion
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.

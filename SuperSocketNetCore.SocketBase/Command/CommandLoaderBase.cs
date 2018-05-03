@@ -23,8 +23,9 @@ namespace SuperSocket.SocketBase.Command
         /// Tries to load commands.
         /// </summary>
         /// <param name="commands">The commands.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        public abstract bool TryLoadCommands(out IEnumerable<TCommand> commands);
+        public abstract bool TryLoadCommands(out IEnumerable<TCommand> commands, IServiceProvider serviceProvider);
 
         /// <summary>
         /// Called when [updated].

@@ -1,4 +1,4 @@
-using SuperSocket.Common;
+﻿using SuperSocket.Common;
 using SuperSocket.SocketBase.Command;
 using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketBase.Logging;
@@ -17,6 +17,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SuperSocket.SocketBase
 {
@@ -199,8 +201,11 @@ namespace SuperSocket.SocketBase
         /// Setups the command into command dictionary
         /// </summary>
         /// <param name="discoveredCommands">The discovered commands.</param>
+        /// <param name="serviceProvider">A container for service objects.</param>
         /// <returns></returns>
-        protected virtual bool SetupCommands(Dictionary<string, ICommand<TAppSession, TRequestInfo>> discoveredCommands)
+        protected virtual bool SetupCommands(
+            Dictionary<string, ICommand<TAppSession, TRequestInfo>> discoveredCommands,
+            IServiceProvider serviceProvider)
         {
             foreach (var loader in m_CommandLoaders)
             {
@@ -218,7 +223,7 @@ namespace SuperSocket.SocketBase
                 }
 
                 IEnumerable<ICommand<TAppSession, TRequestInfo>> commands;
-                if (!loader.TryLoadCommands(out commands))
+                if (!loader.TryLoadCommands(out commands, serviceProvider))
                 {
                     if (Logger.IsErrorEnabled)
                     {

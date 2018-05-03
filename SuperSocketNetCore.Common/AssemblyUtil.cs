@@ -97,6 +97,18 @@ namespace SuperSocket.Common
         {
             return GetImplementedObjectsByInterface<TBaseInterface>(assembly, typeof(TBaseInterface));
         }
+        
+        /// <summary>
+        /// Gets the implemented objects by interface.
+        /// </summary>
+        /// <typeparam name="TBaseInterface">The type of the base interface.</typeparam>
+        /// <param name="assembly">The assembly.</param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetImplementedTypesByInterface<TBaseInterface>(this Assembly assembly)
+            where TBaseInterface : class
+        {
+            return GetImplementedTypesByInterface<TBaseInterface>(assembly, typeof(TBaseInterface));
+        }
 
         /// <summary>
         /// Gets the implemented objects by interface.
@@ -108,21 +120,45 @@ namespace SuperSocket.Common
         public static IEnumerable<TBaseInterface> GetImplementedObjectsByInterface<TBaseInterface>(this Assembly assembly, Type targetType)
             where TBaseInterface : class
         {
-            Type[] arrType = assembly.GetExportedTypes();
+            var types = GetImplementedTypesByInterface<TBaseInterface>(assembly, targetType);
 
             var result = new List<TBaseInterface>();
 
-            for (int i = 0; i < arrType.Length; i++)
+            foreach (var currentImplementType in types)
             {
-                var currentImplementType = arrType[i];
+                result.Add((TBaseInterface)Activator.CreateInstance(currentImplementType));
+            }
 
+            return result;
+        }
+        
+        /// <summary>
+        /// Gets the implemented types by interface.
+        /// </summary>
+        /// <typeparam name="TBaseInterface">The type of the base interface.</typeparam>
+        /// <param name="assembly">The assembly.</param>
+        /// <param name="targetType">Type of the target.</param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetImplementedTypesByInterface<TBaseInterface>(this Assembly assembly, Type targetType)
+            where TBaseInterface : class
+        {
+            Type[] arrType = assembly.GetExportedTypes();
+
+            var result = new List<Type>();
+
+            foreach (var currentImplementType in arrType)
+            {
                 if (currentImplementType.IsAbstract)
+                {
                     continue;
+                }
 
                 if (!targetType.IsAssignableFrom(currentImplementType))
+                {
                     continue;
+                }
 
-                result.Add((TBaseInterface)Activator.CreateInstance(currentImplementType));
+                result.Add(currentImplementType);
             }
 
             return result;

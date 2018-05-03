@@ -1,4 +1,4 @@
-using SuperSocket.SocketBase;
+﻿using SuperSocket.SocketBase;
 using SuperSocket.SocketEngine;
 using System;
 
@@ -52,5 +52,13 @@ namespace TelnetServer_05_StartByConfig
 
             Console.WriteLine("The server was stopped!");            
         }
+    }
+
+    internal class Test : ITest
+    {
+    }
+
+    public interface ITest
+    {
     }
 }
