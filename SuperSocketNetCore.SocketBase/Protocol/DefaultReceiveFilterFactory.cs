@@ -1,5 +1,7 @@
 ﻿using System.Net;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace SuperSocket.SocketBase.Protocol
     /// <typeparam name="TRequestInfo">The type of the request info.</typeparam>
     public class DefaultReceiveFilterFactory<TReceiveFilter, TRequestInfo> : IReceiveFilterFactory<TRequestInfo>
         where TRequestInfo : IRequestInfo
-        where TReceiveFilter : IReceiveFilter<TRequestInfo>, new()
+        where TReceiveFilter : class, IReceiveFilter<TRequestInfo>
     {
         /// <summary>
         /// Creates the Receive filter.
@@ -20,9 +22,12 @@ namespace SuperSocket.SocketBase.Protocol
         /// <returns>
         /// the new created request filer assosiated with this socketSession
         /// </returns>
-        public virtual IReceiveFilter<TRequestInfo> CreateFilter(IAppServer appServer, IAppSession appSession, IPEndPoint remoteEndPoint)
+        public virtual IReceiveFilter<TRequestInfo> CreateFilter(
+            IAppServer appServer,
+            IAppSession appSession,
+            IPEndPoint remoteEndPoint)
         {
-            return new TReceiveFilter();
+            return (TReceiveFilter)ActivatorUtilities.CreateInstance(appServer.ServiceProvider, typeof(TReceiveFilter));
         }
     }
 }
