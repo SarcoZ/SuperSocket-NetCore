@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <Import Project="..\common.props" />
+  <PropertyGroup>
+    <PackageId>SuperSocketNetCore.Dlr</PackageId>
+    <Title>SuperSocketNetCore.Dlr</Title>
+    <RootNamespace>SuperSocket.Dlr</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Scripting">
+      <HintPath>..\Reference\DLR\Net40\Microsoft.Scripting.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

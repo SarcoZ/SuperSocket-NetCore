@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <Import Project="..\common.props" />
+  <PropertyGroup>
+    <PackageId>SuperSocketNetCore</PackageId>
+    <Title>SuperSocketNetCore</Title>
+    <RootNamespace>SuperSocket</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SuperSocketNetCore.Common\SuperSocketNetCore.Common.csproj" />
+    <ProjectReference Include="..\SuperSocketNetCore.Facility\SuperSocketNetCore.Facility.csproj" />
+    <ProjectReference Include="..\SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+</Project>

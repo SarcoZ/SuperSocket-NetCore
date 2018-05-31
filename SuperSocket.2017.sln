@@ -3,19 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26711.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocket.Common", "SuperSocket.Common\SuperSocket.Common.csproj", "{6EBD9272-4F38-4525-BE8F-7D59498712F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocketNetCore.Common", "SuperSocketNetCore.Common\SuperSocketNetCore.Common.csproj", "{6EBD9272-4F38-4525-BE8F-7D59498712F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocket.SocketBase", "SuperSocket.SocketBase\SuperSocket.SocketBase.csproj", "{EC6C18A6-7F3F-4E36-B4B7-78FCBE9CDFC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocketNetCore.SocketBase", "SuperSocketNetCore.SocketBase\SuperSocketNetCore.SocketBase.csproj", "{EC6C18A6-7F3F-4E36-B4B7-78FCBE9CDFC8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocket.ProtoBase", "SuperSocket.ProtoBase\SuperSocket.ProtoBase.csproj", "{C6A54CD7-A604-4EA2-8CB5-6B8075B89977}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocketNetCore.ProtoBase", "SuperSocketNetCore.ProtoBase\SuperSocketNetCore.ProtoBase.csproj", "{C6A54CD7-A604-4EA2-8CB5-6B8075B89977}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocket.SocketEngine", "SuperSocket.SocketEngine\SuperSocket.SocketEngine.csproj", "{F81F50D0-24F0-451B-B791-88B97CA64E17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperSocketNetCore.SocketEngine", "SuperSocketNetCore.SocketEngine\SuperSocketNetCore.SocketEngine.csproj", "{F81F50D0-24F0-451B-B791-88B97CA64E17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocket.Dlr", "SuperSocket.Dlr\SuperSocket.Dlr.csproj", "{AC64EDAA-B892-4FC5-8784-037A5701BAB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocketNetCore.Dlr", "SuperSocketNetCore.Dlr\SuperSocketNetCore.Dlr.csproj", "{AC64EDAA-B892-4FC5-8784-037A5701BAB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocket.Facility", "SuperSocket.Facility\SuperSocket.Facility.csproj", "{2E1E49C1-4525-4674-BECC-BC670314B255}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocketNetCore.Facility", "SuperSocketNetCore.Facility\SuperSocketNetCore.Facility.csproj", "{2E1E49C1-4525-4674-BECC-BC670314B255}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelnetServer_05_StartByConfig", "TelnetServer_05_StartByConfig\TelnetServer_05_StartByConfig.csproj", "{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelnetServer_05_StartByConfig", "TelnetServer_05_StartByConfig\TelnetServer_05_StartByConfig.csproj", "{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSocketNetCore", "SuperSocketNetCore\SuperSocketNetCore.csproj", "{F7E6AF8F-F950-4CFA-B61F-1823DAD127D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBBA1ECB-0371-4DF0-8DF0-40F9DCBC2BC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7E6AF8F-F950-4CFA-B61F-1823DAD127D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7E6AF8F-F950-4CFA-B61F-1823DAD127D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7E6AF8F-F950-4CFA-B61F-1823DAD127D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7E6AF8F-F950-4CFA-B61F-1823DAD127D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

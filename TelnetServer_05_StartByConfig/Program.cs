@@ -2,6 +2,8 @@
 using SuperSocket.SocketEngine;
 using System;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace TelnetServer_05_StartByConfig
 {
     class Program
@@ -9,9 +11,13 @@ namespace TelnetServer_05_StartByConfig
         static void Main(string[] args)
         {
             Console.WriteLine("Press any key to start the server!");
-                  
-            var bootstrap = BootstrapFactory.CreateBootstrap();
 
+            var serviceProvider = new ServiceCollection()
+                .AddTransient<ITest, Test>()
+                .AddSuperSocketNet()
+                .BuildServiceProvider();
+
+            var bootstrap = BootstrapFactory.CreateBootstrap(serviceProvider);
             if (!bootstrap.Initialize())
             {
                 Console.WriteLine("Failed to initialize!");
@@ -45,5 +51,13 @@ namespace TelnetServer_05_StartByConfig
 
             Console.WriteLine("The server was stopped!");            
         }
+    }
+
+    internal class Test : ITest
+    {
+    }
+
+    public interface ITest
+    {
     }
 }
