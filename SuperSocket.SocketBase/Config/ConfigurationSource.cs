@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SuperSocket.SocketBase.Config
 {
@@ -56,6 +57,7 @@ namespace SuperSocket.SocketBase.Config
                 this.CommandLoaders = source.CommandLoaders.Select(s => s.CopyPropertiesTo(new TypeProviderConfig())).ToArray();
             }
         }
+
 
         /// <summary>
         /// Gets the servers definitions.

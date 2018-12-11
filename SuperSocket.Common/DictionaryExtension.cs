@@ -17,8 +17,8 @@ namespace SuperSocket.Common
         public static T GetValue<T>(this IDictionary<object, object> dictionary, object key)
             where T : new()
         {
-            T defaultValue = default(T);
-            return GetValue<T>(dictionary, key, defaultValue);
+            T defaultValue = default;
+            return GetValue(dictionary, key, defaultValue);
         }
 
         /// <summary>
@@ -31,9 +31,7 @@ namespace SuperSocket.Common
         /// <returns></returns>
         public static T GetValue<T>(this IDictionary<object, object> dictionary, object key, T defaultValue)
         {
-            object valueObj;
-
-            if (!dictionary.TryGetValue(key, out valueObj))
+            if (!dictionary.TryGetValue(key, out object valueObj))
             {
                 return defaultValue;
             }

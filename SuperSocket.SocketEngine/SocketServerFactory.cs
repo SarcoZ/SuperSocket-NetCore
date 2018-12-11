@@ -2,6 +2,8 @@
 using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketBase.Protocol;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace SuperSocket.SocketEngine
 {

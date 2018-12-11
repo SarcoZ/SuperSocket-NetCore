@@ -19,9 +19,7 @@ namespace SuperSocket.Common
         {
             if (maxWorkingThreads.HasValue || maxCompletionPortThreads.HasValue)
             {
-                int oldMaxWorkingThreads, oldMaxCompletionPortThreads;
-
-                ThreadPool.GetMaxThreads(out oldMaxWorkingThreads, out oldMaxCompletionPortThreads);
+                ThreadPool.GetMaxThreads(out int oldMaxWorkingThreads, out int oldMaxCompletionPortThreads);
 
                 if (!maxWorkingThreads.HasValue)
                     maxWorkingThreads = oldMaxWorkingThreads;
@@ -39,9 +37,7 @@ namespace SuperSocket.Common
 
             if (minWorkingThreads.HasValue || minCompletionPortThreads.HasValue)
             {
-                int oldMinWorkingThreads, oldMinCompletionPortThreads;
-
-                ThreadPool.GetMinThreads(out oldMinWorkingThreads, out oldMinCompletionPortThreads);
+                ThreadPool.GetMinThreads(out int oldMinWorkingThreads, out int oldMinCompletionPortThreads);
 
                 if (!minWorkingThreads.HasValue)
                     minWorkingThreads = oldMinWorkingThreads;

@@ -33,11 +33,8 @@ namespace SuperSocket.Common
         /// <value>
         /// The track ID.
         /// </value>
-        public ushort TrackID
-        {
-            get { return m_TrackID; }
-        }
-
+        public ushort TrackID => m_TrackID;
+       
         /// <summary>
         /// Initializes a new instance of the <see cref="SendingQueue" /> class.
         /// </summary>
@@ -95,9 +92,7 @@ namespace SuperSocket.Common
 
             while (!m_ReadOnly)
             {
-                bool conflict = false;
-
-                if (TryEnqueue(item, out conflict, trackID))
+                if (TryEnqueue(item, out bool conflict, trackID))
                 {
                     Interlocked.Decrement(ref m_UpdatingCount);
                     return true;
@@ -125,11 +120,9 @@ namespace SuperSocket.Common
 
             Interlocked.Increment(ref m_UpdatingCount);
 
-            bool conflict;
-
             while (!m_ReadOnly)
             {
-                if (TryEnqueue(items, out conflict, trackID))
+                if (TryEnqueue(items, out bool conflict, trackID))
                 {
                     Interlocked.Decrement(ref m_UpdatingCount);
                     return true;

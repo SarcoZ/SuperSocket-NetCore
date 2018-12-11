@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#endif
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,10 +20,7 @@ namespace SuperSocket.Common
         /// <param name="collection">The collection.</param>
         /// <param name="key">The key.</param>
         /// <returns></returns>
-        public static string GetValue(this NameValueCollection collection, string key)
-        {
-            return GetValue(collection, key, string.Empty);
-        }
+        public static string GetValue(this NameValueCollection collection, string key) => GetValue(collection, key, string.Empty);
 
         /// <summary>
         /// Gets the value from namevalue collection by key.
@@ -39,18 +34,14 @@ namespace SuperSocket.Common
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
 
-            if (collection == null)
-                return defaultValue;
+            if (collection == null) return defaultValue;
 
             var e = collection[key];
-
-            if (e == null)
-                return defaultValue;
+            if (e == null) return defaultValue;
 
             return e;
         }
 
-#if !NETSTANDARD2_0
         /// <summary>
         /// Deserializes the specified configuration section.
         /// </summary>
@@ -63,9 +54,8 @@ namespace SuperSocket.Common
             if (section is ConfigurationElementCollection)
             {
                 var collectionType = section.GetType();
-                var att = collectionType.GetCustomAttributes(typeof(ConfigurationCollectionAttribute), true).FirstOrDefault() as ConfigurationCollectionAttribute;
 
-                if (att != null)
+                if (collectionType.GetCustomAttributes(typeof(ConfigurationCollectionAttribute), true).FirstOrDefault() is ConfigurationCollectionAttribute att)
                 {
                     var property = collectionType.GetProperty("AddElementName", BindingFlags.NonPublic | BindingFlags.Instance);
                     property.SetValue(section, att.AddItemName, null);
@@ -185,9 +175,7 @@ namespace SuperSocket.Common
                 if (!sourceProperty.PropertyType.IsSerializable)
                     continue;
 
-                PropertyInfo targetProperty;
-
-                if (targetProperties.TryGetValue(sourceProperty.Name, out targetProperty))
+                if (targetProperties.TryGetValue(sourceProperty.Name, out PropertyInfo targetProperty))
                 {
                     if (targetProperty.CanWrite)
                     {
@@ -235,7 +223,11 @@ namespace SuperSocket.Common
 
         private static void ResetConfigurationForMono(AppDomain appDomain, string configFilePath)
         {
+#if NETSTANDARD2_0
+            appDomain.ResetConfiguration(configFilePath);
+#else
             appDomain.SetupInformation.ConfigurationFile = configFilePath;
+#endif
 
             var configSystem = typeof(ConfigurationManager)
                 .GetField("configSystem", BindingFlags.Static | BindingFlags.NonPublic)
@@ -281,10 +273,12 @@ namespace SuperSocket.Common
         public static void ResetConfiguration(this AppDomain appDomain, string configFilePath)
         {
             if (Platform.IsMono)
+            {
                 ResetConfigurationForMono(appDomain, configFilePath);
-            else
-                ResetConfigurationForDotNet(appDomain, configFilePath);
+                return;
+            }
+
+            ResetConfigurationForDotNet(appDomain, configFilePath);
         }
-#endif
     }
 }

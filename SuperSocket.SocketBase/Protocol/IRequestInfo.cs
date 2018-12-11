@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperSocket.SocketBase.Protocol
+﻿namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
     /// Request information interface

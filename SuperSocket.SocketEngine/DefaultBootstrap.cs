@@ -3,24 +3,26 @@ using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketBase.Logging;
 using SuperSocket.SocketBase.Metadata;
+using SuperSocket.SocketEngine.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Formatters;
 #if !NETSTANDARD2_0
-using System.Configuration;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Ipc;
 #endif
-using System.Runtime.Serialization.Formatters;
 
 namespace SuperSocket.SocketEngine
 {
     /// <summary>
     /// SuperSocket default bootstrap
     /// </summary>
-    public partial class DefaultBootstrap : IBootstrap, ILoggerProvider, IDisposable
+    public partial class DefaultBootstrap : IBootstrap, ILoggerProvider, IDynamicBootstrap, IDisposable
     {
         private List<IWorkItem> m_AppServers;
 
@@ -44,10 +46,7 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Gets the bootstrap logger.
         /// </summary>
-        ILog ILoggerProvider.Logger
-        {
-            get { return m_GlobalLog; }
-        }
+        ILog ILoggerProvider.Logger => m_GlobalLog;
 
         /// <summary>
         /// Gets the log factory.
@@ -57,26 +56,14 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Gets all the app servers running in this bootstrap
         /// </summary>
-        public IEnumerable<IWorkItem> AppServers
-        {
-            get { return m_AppServers; }
-        }
+        public IEnumerable<IWorkItem> AppServers => m_AppServers;
 
         private readonly IRootConfig m_RootConfig;
 
         /// <summary>
         /// Gets the config.
         /// </summary>
-        public IRootConfig Config
-        {
-            get
-            {
-                if (m_Config != null)
-                    return m_Config;
-
-                return m_RootConfig;
-            }
-        }
+        public IRootConfig Config => m_Config ?? m_RootConfig;
 
         /// <summary>
         /// Gets the startup config file.
@@ -86,7 +73,7 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Gets the <see cref="PerformanceMonitor"/> class.
         /// </summary>
-        public IPerformanceMonitor PerfMonitor { get { return m_PerfMonitor; } }
+        public IPerformanceMonitor PerfMonitor => m_PerfMonitor;
 
         private PerformanceMonitor m_PerfMonitor;
 
@@ -98,13 +85,7 @@ namespace SuperSocket.SocketEngine
         /// <value>
         /// The base directory.
         /// </value>
-        public string BaseDirectory
-        {
-            get
-            {
-                return m_BaseDirectory;
-            }
-        }
+        public string BaseDirectory => m_BaseDirectory;
 
         partial void SetDefaultCulture(IRootConfig rootConfig);
 
@@ -137,9 +118,6 @@ namespace SuperSocket.SocketEngine
         /// <param name="logFactory">The log factory.</param>
         public DefaultBootstrap(IRootConfig rootConfig, IEnumerable<IWorkItem> appServers, ILogFactory logFactory)
         {
-            if (rootConfig == null)
-                throw new ArgumentNullException("rootConfig");
-
             if (appServers == null)
                 throw new ArgumentNullException("appServers");
 
@@ -149,7 +127,7 @@ namespace SuperSocket.SocketEngine
             if (logFactory == null)
                 throw new ArgumentNullException("logFactory");
 
-            m_RootConfig = rootConfig;
+            m_RootConfig = rootConfig ?? throw new ArgumentNullException("rootConfig");
 
             SetDefaultCulture(rootConfig);
 
@@ -184,14 +162,8 @@ namespace SuperSocket.SocketEngine
 
             SetDefaultCulture(config);
 
-#if !NETSTANDARD2_0
-            var fileConfigSource = config as ConfigurationSection;
-
-            if (fileConfigSource != null)
+            if (config is ConfigurationSection fileConfigSource)
                 StartupConfigFile = fileConfigSource.GetConfigSource();
-#else
-
-#endif
 
             m_Config = config;
 
@@ -256,9 +228,7 @@ namespace SuperSocket.SocketEngine
         /// <param name="logFactory">The log factory.</param>
         /// <returns></returns>
         internal virtual WorkItemFactoryInfoLoader GetWorkItemFactoryInfoLoader(IConfigurationSource config, ILogFactory logFactory)
-        {
-            return new WorkItemFactoryInfoLoader(config, logFactory);
-        }
+            => new WorkItemFactoryInfoLoader(config, logFactory);
 
         /// <summary>
         /// Initializes the bootstrap with a listen endpoint replacement dictionary
@@ -266,9 +236,7 @@ namespace SuperSocket.SocketEngine
         /// <param name="listenEndPointReplacement">The listen end point replacement.</param>
         /// <returns></returns>
         public virtual bool Initialize(IDictionary<string, IPEndPoint> listenEndPointReplacement)
-        {
-            return Initialize((c) => ReplaceListenEndPoint(c, listenEndPointReplacement));
-        }
+            => Initialize((c) => ReplaceListenEndPoint(c, listenEndPointReplacement));
 
         private IServerConfig ReplaceListenEndPoint(IServerConfig serverConfig, IDictionary<string, IPEndPoint> listenEndPointReplacement)
         {
@@ -278,9 +246,7 @@ namespace SuperSocket.SocketEngine
             {
                 var endPointKey = serverConfig.Name + "_" + serverConfig.Port;
 
-                IPEndPoint instanceEndpoint;
-
-                if (!listenEndPointReplacement.TryGetValue(endPointKey, out instanceEndpoint))
+                if (!listenEndPointReplacement.TryGetValue(endPointKey, out IPEndPoint instanceEndpoint))
                 {
                     throw new Exception(string.Format("Failed to find Input Endpoint configuration {0}!", endPointKey));
                 }
@@ -299,9 +265,7 @@ namespace SuperSocket.SocketEngine
 
                     var endPointKey = serverConfig.Name + "_" + listener.Port;
 
-                    IPEndPoint instanceEndpoint;
-
-                    if (!listenEndPointReplacement.TryGetValue(endPointKey, out instanceEndpoint))
+                    if (!listenEndPointReplacement.TryGetValue(endPointKey, out IPEndPoint instanceEndpoint))
                     {
                         throw new Exception(string.Format("Failed to find Input Endpoint configuration {0}!", endPointKey));
                     }
@@ -334,11 +298,8 @@ namespace SuperSocket.SocketEngine
                 return null;
             }
 
-            var exceptionSource = appServer as IExceptionSource;
-
-            if (exceptionSource != null)
-                exceptionSource.ExceptionThrown += new EventHandler<ErrorEventArgs>(exceptionSource_ExceptionThrown);
-
+            if (appServer is IExceptionSource exceptionSource)
+                exceptionSource.ExceptionThrown += new EventHandler<ErrorEventArgs>(ExceptionSource_ExceptionThrown);
 
             var setupResult = false;
 
@@ -447,11 +408,10 @@ namespace SuperSocket.SocketEngine
             if (m_GlobalLog.IsDebugEnabled)
                 m_GlobalLog.Debug("The Bootstrap has been initialized!");
 
+#if !NETSTANDARD2_0
             try
             {
-#if !NETSTANDARD2_0
                 RegisterRemotingService();
-#endif
             }
             catch (Exception e)
             {
@@ -460,50 +420,38 @@ namespace SuperSocket.SocketEngine
 
                 return false;
             }
+#endif
 
             m_Initialized = true;
 
             return true;
         }
 
-        void exceptionSource_ExceptionThrown(object sender, ErrorEventArgs e)
-        {
-            m_GlobalLog.Error(string.Format("The server {0} threw an exception.", ((IWorkItemBase)sender).Name), e.Exception);
-        }
+        void ExceptionSource_ExceptionThrown(object sender, ErrorEventArgs e)
+            => m_GlobalLog.Error(string.Format("The server {0} threw an exception.", ((IWorkItemBase)sender).Name), e.Exception);
 
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            m_GlobalLog.Error("The process crashed for an unhandled exception!", (Exception)e.ExceptionObject);
-        }
+            => m_GlobalLog.Error("The process crashed for an unhandled exception!", (Exception)e.ExceptionObject);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
         /// <returns></returns>
-        public virtual bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
-        {
-            return Initialize(serverConfigResolver, null);
-        }
+        public virtual bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver) => Initialize(serverConfigResolver, null);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <param name="logFactory">The log factory.</param>
         /// <returns></returns>
-        public virtual bool Initialize(ILogFactory logFactory)
-        {
-            return Initialize(c => c, logFactory);
-        }
+        public virtual bool Initialize(ILogFactory logFactory) => Initialize(c => c, logFactory);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <returns></returns>
-        public virtual bool Initialize()
-        {
-            return Initialize(c => c);
-        }
+        public virtual bool Initialize() => Initialize(c => c);
 
         /// <summary>
         /// Starts this bootstrap.
@@ -661,5 +609,117 @@ namespace SuperSocket.SocketEngine
             if (m_GlobalLog.IsDebugEnabled)
                 m_GlobalLog.Debug("The PerformanceMonitor has been reset for new server has been added!");
         }
+
+        IWorkItem AddNewServer(IServerConfig config)
+        {
+            if (config == null)
+                throw new ArgumentNullException("config");
+
+            if (string.IsNullOrEmpty(config.Name))
+                throw new ArgumentException("The new server's name cannot be empty.", "config");
+
+            if (!m_Initialized)
+                throw new Exception("The bootstrap must be initialized already!");
+
+            if (m_AppServers.Any(s => config.Name.Equals(s.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                m_GlobalLog.ErrorFormat("The new server's name '{0}' has been taken by another server.", config.Name);
+                return null;
+            }
+
+            var configSource = new ConfigurationSource(m_Config);
+            configSource.Servers = new IServerConfig[] { new ServerConfig(config) };
+
+            IEnumerable<WorkItemFactoryInfo> workItemFactories;
+
+            using (var factoryInfoLoader = GetWorkItemFactoryInfoLoader(configSource, null))
+            {
+                try
+                {
+                    workItemFactories = factoryInfoLoader.LoadResult((c) => c);
+                }
+                catch (Exception e)
+                {
+                    if (m_GlobalLog.IsErrorEnabled)
+                        m_GlobalLog.Error(e);
+
+                    return null;
+                }
+            }
+
+            var server = InitializeAndSetupWorkItem(workItemFactories.FirstOrDefault());
+
+            if (server != null)
+            {
+                m_AppServers.Add(server);
+
+                if (!m_Config.DisablePerformanceDataCollector)
+                {
+                    ResetPerfMoniter();
+                }
+
+                if (m_Config is SocketServiceConfig section) //file configuration
+                {
+                    var serverConfig = new Server();
+                    serverConfig.LoadFrom(config);
+                    section.Servers.AddNew(serverConfig);
+                    ConfigurationWatcher.Pause();
+                    section.GetCurrentConfiguration().Save(ConfigurationSaveMode.Minimal);
+                    ConfigurationWatcher.Resume();
+                }
+            }
+
+            return server;
+        }
+
+        bool IDynamicBootstrap.Add(IServerConfig config)
+        {
+            var newWorkItem = AddNewServer(config);
+            return newWorkItem != null;
+        }
+
+        bool IDynamicBootstrap.AddAndStart(IServerConfig config)
+        {
+            var newWorkItem = AddNewServer(config);
+
+            if (newWorkItem == null)
+                return false;
+
+            return newWorkItem.Start();
+        }
+
+        void IDynamicBootstrap.Remove(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            var server = m_AppServers.FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            if (server == null)
+                throw new Exception("The server is not found.");
+
+            if (server.State != ServerState.NotStarted)
+                throw new Exception("The server is running now, you cannot remove it. Please stop it at first.");
+
+            m_AppServers.Remove(server);
+
+            ResetPerfMoniter();
+
+            if (m_Config is SocketServiceConfig section) //file configuration
+            {
+                section.Servers.Remove(name);
+                ConfigurationWatcher.Pause();
+                section.GetCurrentConfiguration().Save(ConfigurationSaveMode.Minimal);
+                ConfigurationWatcher.Resume();
+            }
+        }
+
+#if !NET40
+        partial void SetDefaultCulture(SocketBase.Config.IRootConfig rootConfig)
+        {
+            if (!string.IsNullOrEmpty(rootConfig.DefaultCulture))
+                CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(rootConfig.DefaultCulture);
+        }
+#endif
     }
 }

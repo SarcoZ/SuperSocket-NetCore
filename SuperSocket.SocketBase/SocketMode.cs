@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperSocket.SocketBase
+﻿namespace SuperSocket.SocketBase
 {
     /// <summary>
     /// Socket server running mode

@@ -2,6 +2,7 @@
 using SuperSocket.SocketBase.Config;
 using System;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace SuperSocket.SocketEngine
 {
@@ -36,8 +37,21 @@ namespace SuperSocket.SocketEngine
                 m_ListenSocket.Bind(this.Info.EndPoint);
                 m_ListenSocket.Listen(m_ListenBackLog);
 
-                m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+                m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);  
+                
+#if !NETSTANDARD2_0                                           
+                m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);                                      
+#else
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {                    
+                    m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    m_ListenSocket.LingerState = new LingerOption(enable: false, seconds: 0);
+                }
+#endif
 
                 SocketAsyncEventArgs acceptEventArg = new SocketAsyncEventArgs();
                 m_AcceptSAE = acceptEventArg;

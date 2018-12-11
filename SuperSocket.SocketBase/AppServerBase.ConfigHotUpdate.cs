@@ -4,16 +4,11 @@ using SuperSocket.SocketBase.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
 using System.Linq;
 
 namespace SuperSocket.SocketBase
 {
-
     interface IConfigValueChangeNotifier
     {
         bool Notify(string newValue);
@@ -33,8 +28,6 @@ namespace SuperSocket.SocketBase
             return m_Handler(newValue);
         }
     }
-
-#if !NETSTANDARD2_0
     class ConfigValueChangeNotifier<TConfigOption> : IConfigValueChangeNotifier
         where TConfigOption : ConfigurationElement, new()
     {
@@ -52,29 +45,6 @@ namespace SuperSocket.SocketBase
                 return m_Handler(ConfigurationExtension.DeserializeChildConfig<TConfigOption>(newValue));
         }
     }
-#else
-    class ConfigValueChangeNotifier<TConfigOption> : IConfigValueChangeNotifier
-            where TConfigOption :class, new()
-    {
-        Func<TConfigOption, bool> m_Handler;
-
-        public ConfigValueChangeNotifier(Func<TConfigOption, bool> handler)
-        {
-            m_Handler = handler;
-        }
-        public bool Notify(string newValue)
-        {
-            if (string.IsNullOrEmpty(newValue))
-                return m_Handler(default(TConfigOption));
-            else
-            {
-                return m_Handler(null); //TODO
-            }
-                //return m_Handler(ConfigurationExtension.DeserializeChildConfig<TConfigOption>(newValue));
-        }
-    }
-#endif
-
 
     public abstract partial class AppServerBase<TAppSession, TRequestInfo>
         where TRequestInfo : class, IRequestInfo
@@ -89,7 +59,6 @@ namespace SuperSocket.SocketBase
         /// <param name="config">The server configuration.</param>
         /// <param name="name">The changed config option's name.</param>
         /// <param name="handler">The handler.</param>
-#if !NETSTANDARD2_0
         protected bool RegisterConfigHandler<TConfigOption>(IServerConfig config, string name, Func<TConfigOption, bool> handler)
             where TConfigOption : ConfigurationElement, new()
         {
@@ -97,15 +66,6 @@ namespace SuperSocket.SocketBase
             m_ConfigUpdatedNotifiers.Add(name, notifier);
             return notifier.Notify(config.Options.GetValue(name));
         }
-#else
-        protected bool RegisterConfigHandler<TConfigOption>(IServerConfig config, string name, Func<TConfigOption, bool> handler)
-                    where TConfigOption : class, new()
-        {
-            var notifier = new ConfigValueChangeNotifier<TConfigOption>(handler);
-            m_ConfigUpdatedNotifiers.Add(name, notifier);
-            return notifier.Notify(name); //TODO
-        }
-#endif
 
         /// <summary>
         /// Registers the configuration option value handler, it is used for reading configuration value and reload it after the configuration is changed;
@@ -117,12 +77,7 @@ namespace SuperSocket.SocketBase
         {
             var notifier = new ConfigValueChangeNotifier(handler);
             m_ConfigUpdatedNotifiers.Add(name, notifier);
-
-#if !NETSTANDARD2_0
             return notifier.Notify(config.OptionElements.GetValue(name));
-#else
-            return notifier.Notify(name);
-#endif
         }
 
         int CheckConfigOptionsChange(NameValueCollection oldOptions, NameValueCollection newOptions)
@@ -168,9 +123,8 @@ namespace SuperSocket.SocketBase
 
         private void NotifyConfigUpdated(string key, string newValue)
         {
-            IConfigValueChangeNotifier notifier;
 
-            if (!m_ConfigUpdatedNotifiers.TryGetValue(key, out notifier))
+            if (!m_ConfigUpdatedNotifiers.TryGetValue(key, out IConfigValueChangeNotifier notifier))
                 return;
 
             try
@@ -199,5 +153,4 @@ namespace SuperSocket.SocketBase
             config.CopyPropertiesTo(p => p.GetCustomAttributes(typeof(HotUpdateAttribute), true).Length > 0, updatableConfig);
         }
     }
-
 }

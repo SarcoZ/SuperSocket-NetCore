@@ -1,15 +1,10 @@
-﻿#if !NETSTANDARD2_0
-using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
+﻿using System.Configuration;
 
 namespace SuperSocket.SocketBase.Config
 {
     /// <summary>
     /// Type provider configuration
     /// </summary>
-#if !NETSTANDARD2_0
     public class TypeProvider : ConfigurationElement, ITypeProvider
     {
         /// <summary>
@@ -30,19 +25,4 @@ namespace SuperSocket.SocketBase.Config
             get { return this["type"] as string; }
         }
     }
-#else
-    public class TypeProvider : ITypeProvider
-    {      
-        /// <summary>
-        /// Gets the name.
-        /// </summary>     
-        public string Name { get; set; }
-
-
-        /// <summary>
-        /// Gets the type.
-        /// </summary>     
-        public string Type { get; set; }      
-    }    
-#endif
 }

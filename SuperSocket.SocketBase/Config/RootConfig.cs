@@ -1,13 +1,8 @@
 ﻿using SuperSocket.Common;
 using System;
 using System.Collections.Specialized;
-using System.Threading;
-using System.Collections.Generic;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
+using System.Threading;
 
 namespace SuperSocket.SocketBase.Config
 {
@@ -15,40 +10,28 @@ namespace SuperSocket.SocketBase.Config
     /// Root configuration model
     /// </summary>
     [Serializable]
-#if !NETSTANDARD2_0
     public partial class RootConfig : IRootConfig
-#else
-    public partial class RootConfig : ConfigurationRoot, IRootConfig
-#endif
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RootConfig"/> class.
         /// </summary>
         /// <param name="rootConfig">The root config.</param>
         public RootConfig(IRootConfig rootConfig)
-#if NETSTANDARD2_0        
-        :this()
-#endif
         {
             rootConfig.CopyPropertiesTo(this);
-            this.OptionElements = rootConfig.OptionElements;
+            OptionElements = rootConfig.OptionElements;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RootConfig"/> class.
         /// </summary>
         public RootConfig()
-#if NETSTANDARD2_0
-        : base(new List<IConfigurationProvider>())
-#endif
         {
-            int maxWorkingThread, maxCompletionPortThreads;
-            ThreadPool.GetMaxThreads(out maxWorkingThread, out maxCompletionPortThreads);
+            ThreadPool.GetMaxThreads(out int maxWorkingThread, out int maxCompletionPortThreads);
             MaxWorkingThreads = maxWorkingThread;
             MaxCompletionPortThreads = maxCompletionPortThreads;
 
-            int minWorkingThread, minCompletionPortThreads;
-            ThreadPool.GetMinThreads(out minWorkingThread, out minCompletionPortThreads);
+            ThreadPool.GetMinThreads(out int minWorkingThread, out int minCompletionPortThreads);
             MinWorkingThreads = minWorkingThread;
             MinCompletionPortThreads = minCompletionPortThreads;
 
@@ -116,21 +99,13 @@ namespace SuperSocket.SocketBase.Config
         /// <typeparam name="TConfig">The type of the config.</typeparam>
         /// <param name="childConfigName">Name of the child config.</param>
         /// <returns></returns>
-#if !NETSTANDARD2_0
         public virtual TConfig GetChildConfig<TConfig>(string childConfigName)
             where TConfig : ConfigurationElement, new()
         {
             return OptionElements.GetChildConfig<TConfig>(childConfigName);
         }
-#else
-        public virtual TConfig GetChildConfig<TConfig>(string childConfigName)
-                    where TConfig : class, new()
-        {
-            return GetSection(childConfigName).Get<TConfig>();        
-        }
 
-       
-#endif
+        #endregion
 
 #if !NET40
         /// <summary>
@@ -141,7 +116,5 @@ namespace SuperSocket.SocketBase.Config
         /// </value>
         public string DefaultCulture { get; set; }
 #endif
-
-#endregion
     }
 }

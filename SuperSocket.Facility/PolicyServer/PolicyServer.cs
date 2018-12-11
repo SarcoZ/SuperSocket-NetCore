@@ -3,6 +3,7 @@ using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Config;
 using SuperSocket.SocketBase.Protocol;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;

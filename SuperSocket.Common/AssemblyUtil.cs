@@ -19,10 +19,7 @@ namespace SuperSocket.Common
         /// <typeparam name="T"></typeparam>
         /// <param name="type">The type.</param>
         /// <returns></returns>
-        public static T CreateInstance<T>(string type)
-        {
-            return CreateInstance<T>(type, new object[0]);
-        }
+        public static T CreateInstance<T>(string type) => CreateInstance<T>(type, new object[0]);
 
         /// <summary>
         /// Creates the instance from type name and parameters.
@@ -53,6 +50,40 @@ namespace SuperSocket.Common
         /// <param name="throwOnError">if set to <c>true</c> [throw on error].</param>
         /// <param name="ignoreCase">if set to <c>true</c> [ignore case].</param>
         /// <returns></returns>
+#if !NET35
+        public static Type GetType(string fullTypeName, bool throwOnError, bool ignoreCase)
+        {
+            var targetType = Type.GetType(fullTypeName, false, ignoreCase);
+
+            if (targetType != null)
+                return targetType;
+
+            var names = fullTypeName.Split(',');
+            var assemblyName = names[1].Trim();
+
+            try
+            {
+                var assembly = Assembly.Load(assemblyName);
+
+                var typeNamePrefix = names[0].Trim() + "`";
+
+                var matchedTypes = assembly.GetExportedTypes().Where(t => t.IsGenericType
+                        && t.FullName.StartsWith(typeNamePrefix, ignoreCase, CultureInfo.InvariantCulture)).ToArray();
+
+                if (matchedTypes.Length != 1)
+                    return null;
+
+                return matchedTypes[0];
+            }
+            catch (Exception e)
+            {
+                if (throwOnError)
+                    throw e;
+
+                return null;
+            }
+        }
+#else
         public static Type GetType(string fullTypeName, bool throwOnError, bool ignoreCase)
         {
             return Type.GetType(fullTypeName, null, (a, n, ign) =>
@@ -73,6 +104,7 @@ namespace SuperSocket.Common
                     return matchedTypes[0];
                 }, throwOnError, ignoreCase);
         }
+#endif
 
         /// <summary>
         /// Gets the implement types from assembly.
@@ -81,10 +113,8 @@ namespace SuperSocket.Common
         /// <param name="assembly">The assembly.</param>
         /// <returns></returns>
         public static IEnumerable<Type> GetImplementTypes<TBaseType>(this Assembly assembly)
-        {
-            return assembly.GetExportedTypes().Where(t =>
-                t.IsSubclassOf(typeof(TBaseType)) && t.IsClass && !t.IsAbstract);
-        }
+            => assembly.GetExportedTypes().Where(t => t.IsSubclassOf(typeof(TBaseType)) && t.IsClass && !t.IsAbstract);
+
 
         /// <summary>
         /// Gets the implemented objects by interface.
@@ -92,11 +122,8 @@ namespace SuperSocket.Common
         /// <typeparam name="TBaseInterface">The type of the base interface.</typeparam>
         /// <param name="assembly">The assembly.</param>
         /// <returns></returns>
-        public static IEnumerable<TBaseInterface> GetImplementedObjectsByInterface<TBaseInterface>(this Assembly assembly)
-            where TBaseInterface : class
-        {
-            return GetImplementedObjectsByInterface<TBaseInterface>(assembly, typeof(TBaseInterface));
-        }
+        public static IEnumerable<TBaseInterface> GetImplementedObjectsByInterface<TBaseInterface>(this Assembly assembly) where TBaseInterface : class
+            => GetImplementedObjectsByInterface<TBaseInterface>(assembly, typeof(TBaseInterface));
 
         /// <summary>
         /// Gets the implemented objects by interface.
@@ -128,6 +155,8 @@ namespace SuperSocket.Common
             return result;
         }
 
+#if SILVERLIGHT
+#else
         /// <summary>
         /// Clone object in binary format.
         /// </summary>
@@ -136,7 +165,7 @@ namespace SuperSocket.Common
         /// <returns></returns>
         public static T BinaryClone<T>(this T target)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
+            var formatter = new BinaryFormatter();
             using (MemoryStream ms = new MemoryStream())
             {
                 formatter.Serialize(ms, target);
@@ -144,6 +173,8 @@ namespace SuperSocket.Common
                 return (T)formatter.Deserialize(ms);
             }
         }
+#endif
+
 
         /// <summary>
         /// Copies the properties of one object to another object.
@@ -152,10 +183,7 @@ namespace SuperSocket.Common
         /// <param name="source">The source.</param>
         /// <param name="target">The target.</param>
         /// <returns></returns>
-        public static T CopyPropertiesTo<T>(this T source, T target)
-        {
-            return source.CopyPropertiesTo(p => true, target);
-        }
+        public static T CopyPropertiesTo<T>(this T source, T target) => source.CopyPropertiesTo(p => true, target);
 
         /// <summary>
         /// Copies the properties of one object to another object.
@@ -168,24 +196,24 @@ namespace SuperSocket.Common
         public static T CopyPropertiesTo<T>(this T source, Predicate<PropertyInfo> predict, T target)
         {
             PropertyInfo[] properties = source.GetType()
-               .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
 
             Dictionary<string, PropertyInfo> sourcePropertiesDict = properties.ToDictionary(p => p.Name);
 
             PropertyInfo[] targetProperties = target.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty)
                 .Where(p => predict(p)).ToArray();
+
             for (int i = 0; i < targetProperties.Length; i++)
             {
                 var p = targetProperties[i];
-                PropertyInfo sourceProperty;
 
-                if (sourcePropertiesDict.TryGetValue(p.Name, out sourceProperty))
+                if (sourcePropertiesDict.TryGetValue(p.Name, out PropertyInfo sourceProperty))
                 {
                     if (sourceProperty.PropertyType != p.PropertyType)
                         continue;
 
-                    if (!sourceProperty.PropertyType.IsSerializable || p.GetIndexParameters().Length > 0)
+                    if (!sourceProperty.PropertyType.IsSerializable)
                         continue;
 
                     p.SetValue(target, sourceProperty.GetValue(source, null), null);
@@ -201,9 +229,7 @@ namespace SuperSocket.Common
         /// <param name="assemblyDef">The assembly def.</param>
         /// <returns></returns>
         public static IEnumerable<Assembly> GetAssembliesFromString(string assemblyDef)
-        {
-            return GetAssembliesFromStrings(assemblyDef.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries));
-        }
+            => GetAssembliesFromStrings(assemblyDef.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries));
 
         /// <summary>
         /// Gets the assemblies from strings.

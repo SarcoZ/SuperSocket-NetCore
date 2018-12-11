@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 
 namespace SuperSocket.SocketEngine
-{   
+{
     class PerformanceMonitor : IPerformanceMonitor
     {
         public event Action<NodeStatus> OnStatusUpdate;

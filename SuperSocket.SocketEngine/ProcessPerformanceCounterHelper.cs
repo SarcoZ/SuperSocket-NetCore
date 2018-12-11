@@ -15,7 +15,6 @@ namespace SuperSocket.SocketEngine
         private PerformanceCounter m_ThreadCountPC;
         private PerformanceCounter m_WorkingSetPC;
 #endif
-
         private int m_CpuCores = 1;
 
         private Process m_Process;
@@ -68,7 +67,6 @@ namespace SuperSocket.SocketEngine
 
         private void SetupPerformanceCounters(string instanceName)
         {
-
 #if !NETSTANDARD2_0
             m_CpuUsagePC = new PerformanceCounter("Process", "% Processor Time", instanceName);
             m_ThreadCountPC = new PerformanceCounter("Process", "Thread Count", instanceName);
@@ -82,9 +80,7 @@ namespace SuperSocket.SocketEngine
             var processId = process.Id;
 #if !NETSTANDARD2_0
             var processCategory = new PerformanceCounterCategory("Process");
-
             var runnedInstances = processCategory.GetInstanceNames();
-
 
             foreach (string runnedInstance in runnedInstances)
             {

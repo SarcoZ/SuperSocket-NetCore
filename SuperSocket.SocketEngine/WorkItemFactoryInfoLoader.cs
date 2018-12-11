@@ -196,7 +196,7 @@ namespace SuperSocket.SocketEngine
             return source.Where(p => items.Contains(p.Name, StringComparer.OrdinalIgnoreCase));
         }
 
-        private List<ProviderFactoryInfo> InitializeProviderFactories(ProviderKey key, IEnumerable<SocketBase.Config.ITypeProvider> providerCollection)
+        private List<ProviderFactoryInfo> InitializeProviderFactories(ProviderKey key, IEnumerable<ITypeProvider> providerCollection)
         {
             return InitializeProviderFactories(key, providerCollection, null);
         }

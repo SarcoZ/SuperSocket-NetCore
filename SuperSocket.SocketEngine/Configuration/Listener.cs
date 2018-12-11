@@ -1,17 +1,12 @@
 ﻿using SuperSocket.Common;
 using SuperSocket.SocketBase.Config;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
 
 namespace SuperSocket.SocketEngine.Configuration
 {
     /// <summary>
     /// Listener configuration
     /// </summary>
-#if !NETSTANDARD2_0
     public class Listener : ConfigurationElement, IListenerConfig
     {
         /// <summary>
@@ -62,28 +57,4 @@ namespace SuperSocket.SocketEngine.Configuration
     {
 
     }
-#else
-    public class Listener : IListenerConfig
-    {
-        /// <summary>
-        /// Gets the ip of listener
-        /// </summary>       
-        public string Ip { get; set; }
-
-        /// <summary>
-        /// Gets the port of listener
-        /// </summary>       
-        public int Port { get; set; }
-
-        /// <summary>
-        /// Gets the backlog.
-        /// </summary>      
-        public int Backlog { get; set; } = 100;
-
-        /// <summary>
-        /// Gets the security option, None/Default/Tls/Ssl/...
-        /// </summary>     
-        public string Security { get; set; }
-    }
-#endif
 }

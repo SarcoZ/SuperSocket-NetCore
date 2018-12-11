@@ -51,8 +51,21 @@ namespace SuperSocket.SocketEngine
                 client.IOControl(IOControlCode.KeepAliveValues, m_KeepAliveOptionValues, m_KeepAliveOptionOutValues);
 
             client.NoDelay = true;
-            client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
 
+#if !NETSTANDARD2_0
+
+            client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+#else
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                client.LingerState = new LingerOption(enable: false, seconds: 0);
+            }
+#endif
             return this.AppServer.CreateAppSession(session);
         }
 

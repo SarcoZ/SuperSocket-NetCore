@@ -19,7 +19,7 @@ namespace SuperSocket.SocketBase.Logging
         public Log4NetLogFactory()
             : this("log4net.config")
         {
-            
+
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace SuperSocket.SocketBase.Logging
         /// <returns></returns>
         public override ILog GetLog(string name)
         {
-            return new Log4NetLog(LogManager.GetLogger(m_LogRepository.Name, name));        
+            return new Log4NetLog(LogManager.GetLogger(m_LogRepository.Name, name));
         }
     }
 }

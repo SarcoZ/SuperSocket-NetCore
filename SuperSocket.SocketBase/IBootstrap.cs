@@ -1,8 +1,8 @@
 ﻿using SuperSocket.SocketBase.Config;
+using SuperSocket.SocketBase.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 
 namespace SuperSocket.SocketBase
 {

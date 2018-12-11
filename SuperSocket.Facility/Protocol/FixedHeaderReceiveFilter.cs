@@ -114,10 +114,8 @@ namespace SuperSocket.Facility.Protocol
 
             m_BodyLength = GetBodyLengthFromHeader(buffer, offset, Size);
 
-            if (toBeCopied)
-                m_Header = new ArraySegment<byte>(buffer.CloneRange(offset, Size));
-            else
-                m_Header = new ArraySegment<byte>(buffer, offset, Size);
+            m_Header = toBeCopied ? new ArraySegment<byte>(buffer.CloneRange(offset, Size)) 
+                : new ArraySegment<byte>(buffer, offset, Size);
 
             if (m_BodyLength > 0)
                 return NullRequestInfo;
@@ -126,10 +124,7 @@ namespace SuperSocket.Facility.Protocol
             return ResolveRequestInfo(m_Header, null, 0, 0);//Empty body
         }
 
-        private TRequestInfo ResolveRequestInfo(ArraySegment<byte> header, byte[] bodyBuffer)
-        {
-            return ResolveRequestInfo(header, bodyBuffer, 0, bodyBuffer.Length);
-        }
+        private TRequestInfo ResolveRequestInfo(ArraySegment<byte> header, byte[] bodyBuffer) => ResolveRequestInfo(header, bodyBuffer, 0, bodyBuffer.Length);
 
         /// <summary>
         /// Gets the body length from header.

@@ -32,10 +32,7 @@ namespace SuperSocket.SocketBase.Command
         /// <param name="commands">The commands.</param>
         protected void OnUpdated(IEnumerable<CommandUpdateInfo<TCommand>> commands)
         {
-            var handler = Updated;
-
-            if (handler != null)
-                handler(this, new CommandUpdateEventArgs<TCommand>(commands));
+            Updated?.Invoke(this, new CommandUpdateEventArgs<TCommand>(commands));
         }
 
         /// <summary>
@@ -58,10 +55,7 @@ namespace SuperSocket.SocketBase.Command
         /// <param name="e">The e.</param>
         protected void OnError(Exception e)
         {
-            var handler = Error;
-
-            if (handler != null)
-                handler(this, new ErrorEventArgs(e));
+            Error?.Invoke(this, new ErrorEventArgs(e));
         }
 
         /// <summary>

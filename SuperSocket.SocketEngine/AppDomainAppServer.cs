@@ -40,8 +40,6 @@ namespace SuperSocket.SocketEngine
                 m_HostDomain.SetData(typeof(IsolationMode).Name, IsolationMode.AppDomain);
 
                 var marshalServerType = typeof(MarshalAppServer);
-
-
 #if !NETSTANDARD2_0
                 appServer = (IWorkItem)m_HostDomain.CreateInstanceAndUnwrap(marshalServerType.Assembly.FullName,
                         marshalServerType.FullName,
@@ -68,7 +66,7 @@ namespace SuperSocket.SocketEngine
                     return null;
                 }
 
-                m_HostDomain.DomainUnload += new EventHandler(m_HostDomain_DomainUnload);
+                m_HostDomain.DomainUnload += new EventHandler(M_HostDomain_DomainUnload);
 
                 return appServer;
             }
@@ -85,10 +83,7 @@ namespace SuperSocket.SocketEngine
             }
         }
 
-        void m_HostDomain_DomainUnload(object sender, EventArgs e)
-        {
-            OnStopped();
-        }
+        void M_HostDomain_DomainUnload(object sender, EventArgs e) => OnStopped();
 
         protected override void OnStopped()
         {

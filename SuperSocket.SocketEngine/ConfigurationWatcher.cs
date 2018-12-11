@@ -1,15 +1,12 @@
 ﻿using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Config;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace SuperSocket.SocketEngine
 {
-#if !NETSTANDARD2_0 
     /// <summary>
     /// The configuration file watcher, it is used for hot configuration updating
     /// </summary>
@@ -120,5 +117,4 @@ namespace SuperSocket.SocketEngine
             }
         }
     }
-#endif
 }

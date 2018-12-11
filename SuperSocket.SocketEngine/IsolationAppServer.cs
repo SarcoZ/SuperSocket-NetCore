@@ -43,11 +43,8 @@ namespace SuperSocket.SocketEngine
         /// <value>
         /// <c>true</c> if [status metadata extended]; otherwise, <c>false</c>.
         /// </value>
-        protected virtual bool StatusMetadataExtended
-        {
-            get { return false; }
-        }
-
+        protected virtual bool StatusMetadataExtended => false;
+       
         private StatusInfoAttribute[] PrepareStatusMetadata(StatusInfoAttribute[] serverStatusMetadata)
         {
             if (!StatusMetadataExtended)
@@ -92,10 +89,10 @@ namespace SuperSocket.SocketEngine
             });
 #else
             var hostAppDomain = AppDomain.CreateDomain(Name);
+            //TODO:
 #endif
 
             var assemblyImportType = typeof(AssemblyImport);
-
 
 #if !NETSTANDARD2_0
             hostAppDomain.CreateInstanceFrom(assemblyImportType.Assembly.CodeBase,
@@ -108,7 +105,6 @@ namespace SuperSocket.SocketEngine
                     new object[0]);
 #else
             //TODO
-          
 #endif
 
             return hostAppDomain;
@@ -251,10 +247,7 @@ namespace SuperSocket.SocketEngine
         /// <PermissionSet>
         ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="RemotingConfiguration, Infrastructure" />
         ///   </PermissionSet>
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
+        public override object InitializeLifetimeService() => null;
 
         public void Dispose()
         {
@@ -264,15 +257,10 @@ namespace SuperSocket.SocketEngine
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            Stop();
-        }
+        protected virtual void Dispose(bool disposing) => Stop();
 
-        ~IsolationAppServer()
-        {
-            Dispose(false);
-        }
+        ~IsolationAppServer() => Dispose(false);
+
 
         public event EventHandler<SuperSocket.Common.ErrorEventArgs> ExceptionThrown;
 

@@ -1,30 +1,24 @@
-﻿using SuperSocket.SocketBase;
+﻿using SuperSocket.Common;
+using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Config;
+using SuperSocket.SocketBase.Logging;
 using SuperSocket.SocketBase.Metadata;
-using SuperSocket.SocketEngine.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using SuperSocket.SocketBase.Logging;
-#if !NETSTANDARD2_0
 using System.Configuration;
-using SuperSocket.Common;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
 using System.Linq;
 
 namespace SuperSocket.SocketEngine
 {
     class AppDomainWorkItemFactoryInfoLoader : WorkItemFactoryInfoLoader
     {
-        public AppDomainWorkItemFactoryInfoLoader(SocketBase.Config.IConfigurationSource config, ILogFactory passedInLogFactory)
+        public AppDomainWorkItemFactoryInfoLoader(IConfigurationSource config, ILogFactory passedInLogFactory)
             : base(config, passedInLogFactory)
         {
             InitliazeValidationAppDomain();
         }
 
-        public AppDomainWorkItemFactoryInfoLoader(SocketBase.Config.IConfigurationSource config)
+        public AppDomainWorkItemFactoryInfoLoader(IConfigurationSource config)
             : base(config)
         {
             InitliazeValidationAppDomain();
@@ -77,7 +71,7 @@ namespace SuperSocket.SocketEngine
     {
         private IBootstrap m_Bootstrap;
 
-        public DefaultBootstrapAppDomainWrap(IBootstrap bootstrap, SocketBase.Config.IConfigurationSource config, string startupConfigFile)
+        public DefaultBootstrapAppDomainWrap(IBootstrap bootstrap, IConfigurationSource config, string startupConfigFile)
             : base(config, startupConfigFile)
         {
             m_Bootstrap = bootstrap;
@@ -93,7 +87,7 @@ namespace SuperSocket.SocketEngine
             return workItem.Setup(m_Bootstrap, factoryInfo.Config, factoryInfo.ProviderFactories.ToArray());
         }
 
-        internal override WorkItemFactoryInfoLoader GetWorkItemFactoryInfoLoader(SocketBase.Config.IConfigurationSource config, ILogFactory logFactory)
+        internal override WorkItemFactoryInfoLoader GetWorkItemFactoryInfoLoader(IConfigurationSource config, ILogFactory logFactory)
         {
             return new AppDomainWorkItemFactoryInfoLoader(config, logFactory);
         }
@@ -109,18 +103,12 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Gets all the app servers running in this bootstrap
         /// </summary>
-        public IEnumerable<IWorkItem> AppServers
-        {
-            get { return m_InnerBootstrap.AppServers; }
-        }
+        public IEnumerable<IWorkItem> AppServers => m_InnerBootstrap.AppServers;
 
         /// <summary>
         /// Gets the config.
         /// </summary>
-        public IRootConfig Config
-        {
-            get { return m_InnerBootstrap.Config; }
-        }
+        public IRootConfig Config => m_InnerBootstrap.Config;
 
         /// <summary>
         /// Gets the bootstrap logger.
@@ -140,22 +128,17 @@ namespace SuperSocket.SocketEngine
         /// <summary>
         /// Gets the startup config file.
         /// </summary>
-        public string StartupConfigFile
-        {
-            get { return m_InnerBootstrap.StartupConfigFile; }
-        }
+        public string StartupConfigFile => m_InnerBootstrap.StartupConfigFile;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppDomainBootstrap"/> class.
         /// </summary>
-        public AppDomainBootstrap(SocketBase.Config.IConfigurationSource config)
+        public AppDomainBootstrap(IConfigurationSource config)
         {
             string startupConfigFile = string.Empty;
 
             if (config == null)
                 throw new ArgumentNullException("config");
-
-#if !NETSTANDARD2_0
 
             var configSectionSource = config as ConfigurationSection;
 
@@ -165,15 +148,6 @@ namespace SuperSocket.SocketEngine
             //Keep serializable version of configuration
             if (!config.GetType().IsSerializable)
                 config = new ConfigurationSource(config);
-#else
-            var configurationRoot = new ConfigurationBuilder()
-            .AddInMemoryCollection()                          
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddXmlFile("App.config", optional: true, reloadOnChange: true)
-            .Build();
-
-            config = new ConfigurationSource(new SocketServiceConfig(configurationRoot));
-#endif
 
             //Still use raw configuration type to bootstrap
             m_InnerBootstrap = CreateBootstrapWrap(this, config, startupConfigFile);
@@ -181,49 +155,35 @@ namespace SuperSocket.SocketEngine
             AppDomain.CurrentDomain.SetData("Bootstrap", this);
         }
 
-        protected virtual IBootstrap CreateBootstrapWrap(IBootstrap bootstrap, SocketBase.Config.IConfigurationSource config, string startupConfigFile)
-        {
-            return new DefaultBootstrapAppDomainWrap(this, config, startupConfigFile);
-        }
+        protected virtual IBootstrap CreateBootstrapWrap(IBootstrap bootstrap, IConfigurationSource config, string startupConfigFile)
+            => new DefaultBootstrapAppDomainWrap(this, config, startupConfigFile);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
         /// </summary>
         /// <returns></returns>
-        public bool Initialize()
-        {
-            return m_InnerBootstrap.Initialize();
-        }
+        public bool Initialize() => m_InnerBootstrap.Initialize();
 
         /// <summary>
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="serverConfigResolver">The server config resolver.</param>
         /// <returns></returns>
-        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver)
-        {
-            return m_InnerBootstrap.Initialize(serverConfigResolver);
-        }
+        public bool Initialize(Func<IServerConfig, IServerConfig> serverConfigResolver) => m_InnerBootstrap.Initialize(serverConfigResolver);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration and config resolver.
         /// </summary>
         /// <param name="logFactory">The log factory.</param>
         /// <returns></returns>
-        public bool Initialize(ILogFactory logFactory)
-        {
-            return m_InnerBootstrap.Initialize(logFactory);
-        }
+        public bool Initialize(ILogFactory logFactory) => m_InnerBootstrap.Initialize(logFactory);
 
         /// <summary>
         /// Initializes the bootstrap with a listen endpoint replacement dictionary
         /// </summary>
         /// <param name="listenEndPointReplacement">The listen end point replacement.</param>
         /// <returns></returns>
-        public bool Initialize(IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement)
-        {
-            return m_InnerBootstrap.Initialize(listenEndPointReplacement);
-        }
+        public bool Initialize(IDictionary<string, System.Net.IPEndPoint> listenEndPointReplacement) => m_InnerBootstrap.Initialize(listenEndPointReplacement);
 
         /// <summary>
         /// Initializes the bootstrap with the configuration
@@ -243,28 +203,18 @@ namespace SuperSocket.SocketEngine
         /// Starts this bootstrap.
         /// </summary>
         /// <returns></returns>
-        public StartResult Start()
-        {
-            return m_InnerBootstrap.Start();
-        }
+        public StartResult Start() => m_InnerBootstrap.Start();
 
         /// <summary>
         /// Stops this bootstrap.
         /// </summary>
-        public void Stop()
-        {
-            m_InnerBootstrap.Stop();
-        }
+        public void Stop() => m_InnerBootstrap.Stop();
 
-        public string BaseDirectory
-        {
-            get { return m_InnerBootstrap.BaseDirectory; }
-        }
+        public string BaseDirectory => m_InnerBootstrap.BaseDirectory;
 
         void IDisposable.Dispose()
         {
-            var disposableBootstrap = m_InnerBootstrap as IDisposable;
-            if (disposableBootstrap != null)
+            if (m_InnerBootstrap is IDisposable disposableBootstrap)
                 disposableBootstrap.Dispose();
         }
     }

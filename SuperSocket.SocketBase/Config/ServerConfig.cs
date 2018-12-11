@@ -2,12 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
+using System.Linq;
 
 namespace SuperSocket.SocketBase.Config
 {
@@ -15,11 +11,7 @@ namespace SuperSocket.SocketBase.Config
     /// Server configruation model
     /// </summary>
     [Serializable]
-#if !NETSTANDARD2_0
     public partial class ServerConfig : IServerConfig
-#else
-    public partial class ServerConfig : ConfigurationRoot, IServerConfig
-#endif
     {
         /// <summary>
         /// Default ReceiveBufferSize
@@ -95,9 +87,6 @@ namespace SuperSocket.SocketBase.Config
         /// </summary>
         /// <param name="serverConfig">The server config.</param>
         public ServerConfig(IServerConfig serverConfig)
-#if NETSTANDARD2_0
-            : base(new List<IConfigurationProvider>())
-#endif
         {
             serverConfig.CopyPropertiesTo(this);
 
@@ -122,9 +111,6 @@ namespace SuperSocket.SocketBase.Config
         /// Initializes a new instance of the <see cref="ServerConfig"/> class.
         /// </summary>
         public ServerConfig()
-#if NETSTANDARD2_0
-            : base(new List<IConfigurationProvider>())
-#endif
         {
             Security = "None";
             MaxConnectionNumber = DefaultMaxConnectionNumber;
@@ -350,20 +336,11 @@ namespace SuperSocket.SocketBase.Config
         /// <typeparam name="TConfig">The type of the config.</typeparam>
         /// <param name="childConfigName">Name of the child config.</param>
         /// <returns></returns>
-
-#if !NETSTANDARD2_0
         public virtual TConfig GetChildConfig<TConfig>(string childConfigName)
             where TConfig : ConfigurationElement, new()
         {
             return this.OptionElements.GetChildConfig<TConfig>(childConfigName);
         }
-#else
-        public virtual TConfig GetChildConfig<TConfig>(string childConfigName)
-                    where TConfig : class, new()
-        {
-            return default(TConfig);  //TODO
-        }
-#endif
 
         /// <summary>
         /// Gets and sets the listeners' configuration.

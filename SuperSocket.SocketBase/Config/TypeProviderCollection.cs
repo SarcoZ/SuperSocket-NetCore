@@ -1,13 +1,8 @@
 ﻿using System.Collections.Generic;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
 
 namespace SuperSocket.SocketBase.Config
 {
-#if !NETSTANDARD2_0
     /// <summary>
     /// Type provider colletion configuration
     /// </summary>
@@ -58,5 +53,4 @@ namespace SuperSocket.SocketBase.Config
             }
         }
     }
-#endif
 }

@@ -157,8 +157,7 @@ namespace SuperSocket.SocketBase
             if (string.IsNullOrEmpty(sessionID))
                 return NullAppSession;
 
-            TAppSession targetSession;
-            m_SessionDict.TryGetValue(sessionID, out targetSession);
+            m_SessionDict.TryGetValue(sessionID, out TAppSession targetSession);
             return targetSession;
         }
 
@@ -173,8 +172,7 @@ namespace SuperSocket.SocketBase
 
             if (!string.IsNullOrEmpty(sessionID))
             {
-                TAppSession removedSession;
-                if (!m_SessionDict.TryRemove(sessionID, out removedSession))
+                if (!m_SessionDict.TryRemove(sessionID, out TAppSession removedSession))
                 {
                     if (Logger.IsErrorEnabled)
                         Logger.Error(session, "Failed to remove this session, Because it has't been in session container!");
@@ -197,7 +195,7 @@ namespace SuperSocket.SocketBase
 
         #region Clear idle sessions
 
-        private System.Threading.Timer m_ClearIdleSessionTimer = null;
+        private Timer m_ClearIdleSessionTimer = null;
 
         private void StartClearSessionTimer()
         {
@@ -225,7 +223,7 @@ namespace SuperSocket.SocketBase
 
                     var timeOutSessions = sessionSource.Where(s => s.Value.LastActiveTime <= timeOut).Select(s => s.Value);
 
-                    System.Threading.Tasks.Parallel.ForEach(timeOutSessions, s =>
+                    Parallel.ForEach(timeOutSessions, s =>
                     {
                         if (Logger.IsInfoEnabled)
                             Logger.Info(s, string.Format("The session will be closed for {0} timeout, the session start time: {1}, last active time: {2}!", now.Subtract(s.LastActiveTime).TotalSeconds, s.StartTime, s.LastActiveTime));
@@ -259,7 +257,7 @@ namespace SuperSocket.SocketBase
 
         #region Take session snapshot
 
-        private System.Threading.Timer m_SessionSnapshotTimer = null;
+        private Timer m_SessionSnapshotTimer = null;
 
         private KeyValuePair<string, TAppSession>[] m_SessionsSnapshot = new KeyValuePair<string, TAppSession>[0];
 

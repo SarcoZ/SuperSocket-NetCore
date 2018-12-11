@@ -1,5 +1,9 @@
 ﻿namespace SuperSocket.Common
 {
+    /// <summary>
+    /// Array segment extension
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     class ArraySegmentEx<T>
     {
         public ArraySegmentEx(T[] array, int offset, int count)
@@ -8,6 +12,7 @@
             Offset = offset;
             Count = count;
         }
+        
         /// <summary>
         /// Gets the array.
         /// </summary>
@@ -23,8 +28,14 @@
         /// </summary>
         public int Offset { get; private set; }
 
+        /// <summary>
+        /// From
+        /// </summary>
         public int From { get; set; }
 
+        /// <summary>
+        /// To
+        /// </summary>
         public int To { get; set; }
     }
 }

@@ -1,12 +1,9 @@
 ﻿using SuperSocket.Common;
 using SuperSocket.SocketBase.Config;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#endif
 
 namespace SuperSocket.SocketEngine.Configuration
 {
-#if !NETSTANDARD2_0
     /// <summary>
     /// Server configuration collection
     /// </summary>
@@ -31,5 +28,4 @@ namespace SuperSocket.SocketEngine.Configuration
             base.BaseRemove(name);
         }
     }
-#endif  
 }

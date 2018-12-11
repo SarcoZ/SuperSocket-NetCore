@@ -1,6 +1,4 @@
-﻿using SuperSocket.SocketBase.Logging;
-
-namespace SuperSocket.SocketBase.Config
+﻿namespace SuperSocket.SocketBase.Logging
 {
     /// <summary>
     /// LogFactory Interface

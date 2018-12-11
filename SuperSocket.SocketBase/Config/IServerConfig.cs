@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
 
 namespace SuperSocket.SocketBase.Config
 {
@@ -210,14 +206,8 @@ namespace SuperSocket.SocketBase.Config
         /// <typeparam name="TConfig">The type of the config.</typeparam>
         /// <param name="childConfigName">Name of the child config.</param>
         /// <returns></returns>
-#if !NETSTANDARD2_0
-
         TConfig GetChildConfig<TConfig>(string childConfigName)
             where TConfig : ConfigurationElement, new();
-#else
-        TConfig GetChildConfig<TConfig>(string childConfigName)
-                    where TConfig : class, new();
-#endif
 
 
         /// <summary>
@@ -278,7 +268,7 @@ namespace SuperSocket.SocketBase.Config
 
 #if !NET40
         /// <summary>
-        /// Gets or sets the default culture.
+        /// Gets the default culture for this server.
         /// </summary>
         /// <value>
         /// The default culture.

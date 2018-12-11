@@ -28,13 +28,8 @@ namespace SuperSocket.SocketEngine
             m_Process = Process.GetCurrentProcess();
         }
 
-        protected override bool StatusMetadataExtended
-        {
-            get
-            {
-                return m_AppDomainMonitoringSupported;
-            }
-        }
+        protected override bool StatusMetadataExtended => m_AppDomainMonitoringSupported;
+
 
         public override StatusInfoCollection CollectServerStatus(StatusInfoCollection nodeStatus)
         {

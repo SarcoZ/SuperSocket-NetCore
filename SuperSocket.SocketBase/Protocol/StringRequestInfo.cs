@@ -1,4 +1,8 @@
-﻿namespace SuperSocket.SocketBase.Protocol
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace SuperSocket.SocketBase.Protocol
 {
     /// <summary>
     /// String type request information

@@ -45,20 +45,18 @@ namespace SuperSocket.Common
         /// <returns>true if the buffer was successfully set, else false</returns>
         public bool SetBuffer(SocketAsyncEventArgs args)
         {
-
             if (m_freeIndexPool.Count > 0)
             {
                 args.SetBuffer(m_buffer, m_freeIndexPool.Pop(), m_bufferSize);
+                return true;
             }
-            else
-            {
-                if ((m_numBytes - m_bufferSize) < m_currentIndex)
-                {
-                    return false;
-                }
-                args.SetBuffer(m_buffer, m_currentIndex, m_bufferSize);
-                m_currentIndex += m_bufferSize;
-            }
+
+            if ((m_numBytes - m_bufferSize) < m_currentIndex)
+                return false;
+
+            args.SetBuffer(m_buffer, m_currentIndex, m_bufferSize);
+            m_currentIndex += m_bufferSize;
+
             return true;
         }
 
@@ -71,5 +69,6 @@ namespace SuperSocket.Common
             m_freeIndexPool.Push(args.Offset);
             args.SetBuffer(null, 0, 0);
         }
+
     }
 }

@@ -1,6 +1,8 @@
 ﻿using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Protocol;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace SuperSocket.Facility.Protocol
 {
@@ -18,11 +20,8 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Gets the size of the fixed size Receive filter.
         /// </summary>
-        public int Size
-        {
-            get { return m_Size; }
-        }
-
+        public int Size => m_Size;
+       
         /// <summary>
         /// Null RequestInfo
         /// </summary>
@@ -97,29 +96,20 @@ namespace SuperSocket.Facility.Protocol
         /// <value>
         /// The size of the rest buffer.
         /// </value>
-        public int LeftBufferSize
-        {
-            get { return m_ParsedLength; }
-        }
+        public int LeftBufferSize => m_ParsedLength;
+
 
         /// <summary>
         /// Gets the next Receive filter.
         /// </summary>
-        public virtual IReceiveFilter<TRequestInfo> NextReceiveFilter
-        {
-            get { return null; }
-        }
-
+        public virtual IReceiveFilter<TRequestInfo> NextReceiveFilter => null;
 
         private int m_OffsetDelta;
 
         /// <summary>
         /// Gets the offset delta.
         /// </summary>
-        int IOffsetAdapter.OffsetDelta
-        {
-            get { return m_OffsetDelta; }
-        }
+        int IOffsetAdapter.OffsetDelta => m_OffsetDelta;
 
         /// <summary>
         /// Gets the filter state.
@@ -138,9 +128,6 @@ namespace SuperSocket.Facility.Protocol
         /// <summary>
         /// Resets this instance.
         /// </summary>
-        public virtual void Reset()
-        {
-            InternalReset();
-        }
+        public virtual void Reset()=> InternalReset();      
     }
 }

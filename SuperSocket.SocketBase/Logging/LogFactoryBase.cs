@@ -1,5 +1,4 @@
-﻿using SuperSocket.SocketBase.Config;
-using System;
+﻿using System;
 using System.IO;
 
 namespace SuperSocket.SocketBase.Logging

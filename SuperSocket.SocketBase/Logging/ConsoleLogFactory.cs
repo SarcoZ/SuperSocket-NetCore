@@ -1,6 +1,4 @@
-﻿using SuperSocket.SocketBase.Config;
-
-namespace SuperSocket.SocketBase.Logging
+﻿namespace SuperSocket.SocketBase.Logging
 {
     /// <summary>
     /// Console log factory

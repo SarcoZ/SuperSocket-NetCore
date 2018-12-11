@@ -112,10 +112,7 @@ namespace SuperSocket.SocketEngine
         public SocketSession(Socket client)
             : this(Guid.NewGuid().ToString())
         {
-            if (client == null)
-                throw new ArgumentNullException("client");
-
-            m_Client = client;
+            m_Client = client ?? throw new ArgumentNullException("client");
             LocalEndPoint = (IPEndPoint)client.LocalEndPoint;
             RemoteEndPoint = (IPEndPoint)client.RemoteEndPoint;
         }
@@ -134,8 +131,7 @@ namespace SuperSocket.SocketEngine
             if (m_SendingQueuePool == null)
                 m_SendingQueuePool = ((SocketServerBase)((ISocketServerAccessor)appSession.AppServer).SocketServer).SendingQueuePool;
 
-            SendingQueue queue;
-            if (m_SendingQueuePool.TryGet(out queue))
+            if (m_SendingQueuePool.TryGet(out SendingQueue queue))
             {
                 m_SendingQueue = queue;
                 queue.StartEnqueue();
@@ -196,11 +192,7 @@ namespace SuperSocket.SocketEngine
                 }
             }
 
-            var closedHandler = Closed;
-            if (closedHandler != null)
-            {
-                closedHandler(this, reason);
-            }
+            Closed?.Invoke(this, reason);
         }
 
         /// <summary>
@@ -292,7 +284,6 @@ namespace SuperSocket.SocketEngine
                 }
 
                 var currentQueue = m_SendingQueue;
-
                 if (currentQueue != queue || sendingTrackID != currentQueue.TrackID)
                 {
                     //Has been sent
@@ -301,17 +292,13 @@ namespace SuperSocket.SocketEngine
                 }
             }
 
-            Socket client;
-
-            if (IsInClosingOrClosed && TryValidateClosedBySocket(out client))
+            if (IsInClosingOrClosed && TryValidateClosedBySocket(out Socket client))
             {
                 OnSendEnd();
                 return;
             }
 
-            SendingQueue newQueue;
-
-            if (!m_SendingQueuePool.TryGet(out newQueue))
+            if (!m_SendingQueuePool.TryGet(out SendingQueue newQueue))
             {
                 OnSendEnd(CloseReason.InternalError, true);
                 AppSession.Logger.Error("There is no enougth sending queue can be used.");
@@ -374,10 +361,8 @@ namespace SuperSocket.SocketEngine
 
             if (IsInClosingOrClosed)
             {
-                Socket client;
-
                 //has data is being sent and the socket isn't closed
-                if (newQueue.Count > 0 && !TryValidateClosedBySocket(out client))
+                if (newQueue.Count > 0 && !TryValidateClosedBySocket(out Socket client))
                 {
                     StartSend(newQueue, newQueue.TrackID, false);
                     return;
@@ -666,87 +651,11 @@ namespace SuperSocket.SocketEngine
 
             return IsIgnorableSocketError(socketErrorCode);
         }
-    }
-
-#if !NET40
-    abstract partial class SocketSession
-    {
 
         private const string m_GeneralErrorMessage = "Unexpected error";
         private const string m_GeneralSocketErrorMessage = "Unexpected socket error: {0}";
-        private const string m_CallerInformation = "Caller: {0}, file path: {1}, line number: {2}";
 
-
-        /// <summary>
-        /// Logs the error, skip the ignored exception
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        /// <param name="caller">The caller.</param>
-        /// <param name="callerFilePath">The caller file path.</param>
-        /// <param name="callerLineNumber">The caller line number.</param>
-        protected void LogError(Exception exception, [CallerMemberName] string caller = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = -1)
-        {
-            int socketErrorCode;
-
-            //This exception is ignored, needn't log it
-            if (IsIgnorableException(exception, out socketErrorCode))
-                return;
-
-            var message = socketErrorCode > 0 ? string.Format(m_GeneralSocketErrorMessage, socketErrorCode) : m_GeneralErrorMessage;
-
-            AppSession.Logger.Error(this
-                , message + Environment.NewLine + string.Format(m_CallerInformation, caller, callerFilePath, callerLineNumber)
-                , exception);
-        }
-
-        /// <summary>
-        /// Logs the error, skip the ignored exception
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="exception">The exception.</param>
-        /// <param name="caller">The caller.</param>
-        /// <param name="callerFilePath">The caller file path.</param>
-        /// <param name="callerLineNumber">The caller line number.</param>
-        protected void LogError(string message, Exception exception, [CallerMemberName] string caller = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = -1)
-        {
-            int socketErrorCode;
-
-            //This exception is ignored, needn't log it
-            if (IsIgnorableException(exception, out socketErrorCode))
-                return;
-
-            AppSession.Logger.Error(this
-                , message + Environment.NewLine + string.Format(m_CallerInformation, caller, callerFilePath, callerLineNumber)
-                , exception);
-        }
-
-        /// <summary>
-        /// Logs the socket error, skip the ignored error
-        /// </summary>
-        /// <param name="socketErrorCode">The socket error code.</param>
-        /// <param name="caller">The caller.</param>
-        /// <param name="callerFilePath">The caller file path.</param>
-        /// <param name="callerLineNumber">The caller line number.</param>
-        protected void LogError(int socketErrorCode, [CallerMemberName] string caller = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = -1)
-        {
-            if (!Config.LogAllSocketException)
-            {
-                //This error is ignored, needn't log it
-                if (IsIgnorableSocketError(socketErrorCode))
-                    return;
-            }
-
-            AppSession.Logger.Error(this
-                , string.Format(m_GeneralSocketErrorMessage, socketErrorCode) + Environment.NewLine + string.Format(m_CallerInformation, caller, callerFilePath, callerLineNumber)
-                , new SocketException(socketErrorCode));
-        }
-    }
-#else
-    abstract partial class SocketSession
-    {
-        private const string m_GeneralErrorMessage = "Unexpected error";
-        private const string m_GeneralSocketErrorMessage = "Unexpected socket error: {0}";
-
+#if NET40
         /// <summary>
         /// Logs the error, skip the ignored exception
         /// </summary>
@@ -795,6 +704,68 @@ namespace SuperSocket.SocketEngine
 
             AppSession.Logger.Error(this, string.Format(m_GeneralSocketErrorMessage, socketErrorCode), new SocketException(socketErrorCode));
         }
-    }
+#else       
+        private const string m_CallerInformation = "Caller: {0}, file path: {1}, line number: {2}";
+
+        /// <summary>
+        /// Logs the error, skip the ignored exception
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <param name="caller">The caller.</param>
+        /// <param name="callerFilePath">The caller file path.</param>
+        /// <param name="callerLineNumber">The caller line number.</param>
+        protected void LogError(Exception exception, [CallerMemberName] string caller = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = -1)
+        {
+            //This exception is ignored, needn't log it
+            if (IsIgnorableException(exception, out int socketErrorCode))
+                return;
+
+            var message = socketErrorCode > 0 ? string.Format(m_GeneralSocketErrorMessage, socketErrorCode) : m_GeneralErrorMessage;
+
+            AppSession.Logger.Error(this
+                , message + Environment.NewLine + string.Format(m_CallerInformation, caller, callerFilePath, callerLineNumber)
+                , exception);
+        }
+
+        /// <summary>
+        /// Logs the error, skip the ignored exception
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="caller">The caller.</param>
+        /// <param name="callerFilePath">The caller file path.</param>
+        /// <param name="callerLineNumber">The caller line number.</param>
+        protected void LogError(string message, Exception exception, [CallerMemberName] string caller = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = -1)
+        {
+            //This exception is ignored, needn't log it
+            if (IsIgnorableException(exception, out int socketErrorCode))
+                return;
+
+            AppSession.Logger.Error(this
+                , message + Environment.NewLine + string.Format(m_CallerInformation, caller, callerFilePath, callerLineNumber)
+                , exception);
+        }
+
+        /// <summary>
+        /// Logs the socket error, skip the ignored error
+        /// </summary>
+        /// <param name="socketErrorCode">The socket error code.</param>
+        /// <param name="caller">The caller.</param>
+        /// <param name="callerFilePath">The caller file path.</param>
+        /// <param name="callerLineNumber">The caller line number.</param>
+        protected void LogError(int socketErrorCode, [CallerMemberName] string caller = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = -1)
+        {
+            if (!Config.LogAllSocketException)
+            {
+                //This error is ignored, needn't log it
+                if (IsIgnorableSocketError(socketErrorCode))
+                    return;
+            }
+
+            AppSession.Logger.Error(this
+                , string.Format(m_GeneralSocketErrorMessage, socketErrorCode) + Environment.NewLine + string.Format(m_CallerInformation, caller, callerFilePath, callerLineNumber)
+                , new SocketException(socketErrorCode));
+        }
 #endif
+    }
 }

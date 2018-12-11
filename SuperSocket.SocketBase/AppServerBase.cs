@@ -12,6 +12,8 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Security;
+using System.Runtime.ExceptionServices;
+using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -330,10 +332,10 @@ namespace SuperSocket.SocketBase
 
             if (!m_ThreadPoolConfigured)
             {
-                if (!TheadPoolEx.ResetThreadPool(rootConfig.MaxWorkingThreads > 0 ? rootConfig.MaxWorkingThreads : new Nullable<int>(),
-                        rootConfig.MaxCompletionPortThreads > 0 ? rootConfig.MaxCompletionPortThreads : new Nullable<int>(),
-                        rootConfig.MinWorkingThreads > 0 ? rootConfig.MinWorkingThreads : new Nullable<int>(),
-                        rootConfig.MinCompletionPortThreads > 0 ? rootConfig.MinCompletionPortThreads : new Nullable<int>()))
+                if (!TheadPoolEx.ResetThreadPool(rootConfig.MaxWorkingThreads >= 0 ? rootConfig.MaxWorkingThreads : new Nullable<int>(),
+                        rootConfig.MaxCompletionPortThreads >= 0 ? rootConfig.MaxCompletionPortThreads : new Nullable<int>(),
+                        rootConfig.MinWorkingThreads >= 0 ? rootConfig.MinWorkingThreads : new Nullable<int>(),
+                        rootConfig.MinCompletionPortThreads >= 0 ? rootConfig.MinCompletionPortThreads : new Nullable<int>()))
                 {
                     throw new Exception("Failed to configure thread pool!");
                 }
@@ -478,6 +480,79 @@ namespace SuperSocket.SocketBase
             }
         }
 
+#if NET_35
+
+        /// <summary>
+        /// Setups with the specified ip and port.
+        /// </summary>
+        /// <param name="ip">The ip.</param>
+        /// <param name="port">The port.</param>
+        /// <param name="providers">The providers.</param>
+        /// <returns></returns>
+        public bool Setup(string ip, int port, params object[] providers)
+        {
+            return Setup(new ServerConfig
+            {
+                Name = string.Format("{0}-{1}", this.GetType().Name, Math.Abs(this.GetHashCode())),
+                Ip = ip,
+                Port = port
+            }, providers);
+        }
+        /// <summary>
+        /// Setups with the specified config, used for programming setup
+        /// </summary>
+        /// <param name="config">The server config.</param>
+        /// <param name="providers">The providers.</param>
+        /// <returns></returns>
+        public bool Setup(IServerConfig config, params object[] providers)
+        {
+            return Setup(new RootConfig(), config, providers);
+        }
+
+        /// <summary>
+        /// Setups with the specified root config, used for programming setup
+        /// </summary>
+        /// <param name="rootConfig">The root config.</param>
+        /// <param name="config">The server config.</param>
+        /// <param name="providers">The providers.</param>
+        /// <returns></returns>
+        public bool Setup(IRootConfig rootConfig, IServerConfig config, params object[] providers)
+        {
+            TrySetInitializedState();
+
+            SetupBasic(rootConfig, config, GetProviderInstance<ISocketServerFactory>(providers));
+
+            if (!SetupLogFactory(GetProviderInstance<ILogFactory>(providers)))
+                return false;
+
+            Logger = CreateLogger(this.Name);
+
+            if (!SetupMedium(GetProviderInstance<IReceiveFilterFactory<TRequestInfo>>(providers), GetProviderInstance<IEnumerable<IConnectionFilter>>(providers), GetProviderInstance<IEnumerable<ICommandLoader<ICommand<TAppSession, TRequestInfo>>>>(providers)))
+                return false;
+
+            if (!SetupAdvanced(config))
+                return false;
+
+            if (!Setup(rootConfig, config))
+                return false;
+
+            if(!SetupFinal())
+                return false;
+
+            m_StateCode = ServerStateConst.NotStarted;
+            return true;
+        }
+
+        private T GetProviderInstance<T>(object[] providers)
+        {
+            if (providers == null || !providers.Any())
+                return default(T);
+
+            var providerType = typeof(T);
+            return (T)providers.FirstOrDefault(p => p != null && providerType.IsAssignableFrom(p.GetType()));
+        }
+#else
+
         /// <summary>
         /// Setups with the specified config.
         /// </summary>
@@ -555,6 +630,7 @@ namespace SuperSocket.SocketBase
                           connectionFilters,
                           commandLoaders);
         }
+#endif
 
         /// <summary>
         /// Setups the specified root config.
@@ -690,7 +766,7 @@ namespace SuperSocket.SocketBase
             //Log4NetLogFactory is default log factory
             if (LogFactory == null)
                 LogFactory = new Log4NetLogFactory();
-           
+
             return true;
         }
 
@@ -1132,6 +1208,7 @@ namespace SuperSocket.SocketBase
         /// </summary>
         /// <param name="session">The session.</param>
         /// <param name="requestInfo">The request info.</param>
+        [HandleProcessCorruptedStateExceptions]
         protected virtual void ExecuteCommand(TAppSession session, TRequestInfo requestInfo)
         {
             if (m_RequestHandler == null)
@@ -1175,6 +1252,10 @@ namespace SuperSocket.SocketBase
                             try
                             {
                                 command.ExecuteCommand(session, requestInfo);
+                            }
+                            catch (AccessViolationException ex)
+                            {
+                                commandContext.Exception = ex;
                             }
                             catch (Exception exc)
                             {
@@ -1366,7 +1447,7 @@ namespace SuperSocket.SocketBase
         }
 
         /// <summary>
-        /// Called when [new session connected] net core not support delegate.BeginInvoke use AsyncRun instead
+        /// Called when [new session connected].
         /// </summary>
         /// <param name="session">The session.</param>
         protected virtual void OnNewSessionConnected(TAppSession session)
@@ -1375,10 +1456,8 @@ namespace SuperSocket.SocketBase
             if (handler == null)
                 return;
 
-            this.AsyncRun(() =>
-            {
-                handler.Invoke(session);
-            });          
+            //handler.BeginInvoke(session, OnNewSessionConnectedCallback, handler);
+            handler.Invoke(session);
         }
 
         private void OnNewSessionConnectedCallback(IAsyncResult result)
@@ -1441,7 +1520,8 @@ namespace SuperSocket.SocketBase
 
             if (handler != null)
             {
-                handler.BeginInvoke(session, reason, OnSessionClosedCallback, handler);
+                //handler.BeginInvoke(session, reason, OnSessionClosedCallback, handler);
+                handler.Invoke(session, reason);
             }
 
             session.OnSessionClosed(reason);

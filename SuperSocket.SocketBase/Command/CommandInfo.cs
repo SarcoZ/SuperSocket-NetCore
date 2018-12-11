@@ -5,7 +5,7 @@ using System.Linq;
 namespace SuperSocket.SocketBase.Command
 {
     class CommandInfo<TCommand>
-         where TCommand : ICommand
+        where TCommand : ICommand
     {
         public TCommand Command { get; private set; }
 

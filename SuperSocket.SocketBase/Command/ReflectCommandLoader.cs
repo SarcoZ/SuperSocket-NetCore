@@ -49,11 +49,7 @@ namespace SuperSocket.SocketBase.Command
             if (m_AppServer.GetType().Assembly != this.GetType().Assembly)
                 commandAssemblies.Add(m_AppServer.GetType().Assembly);
 
-#if !NETSTANDARD2_0
             string commandAssembly = m_AppServer.Config.Options.GetValue("commandAssembly");
-#else
-            string commandAssembly = string.Empty;
-#endif
 
             if (!string.IsNullOrEmpty(commandAssembly))
             {

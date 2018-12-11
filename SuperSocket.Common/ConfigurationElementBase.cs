@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.Xml;
-#if !NETSTANDARD2_0
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
+using System.Xml;
 
 namespace SuperSocket.Common
 {
     /// <summary>
     /// ConfigurationElementBase
     /// </summary>
-#if !NETSTANDARD2_0
     [Serializable]
     public class ConfigurationElementBase : ConfigurationElement
     {
@@ -41,10 +36,7 @@ namespace SuperSocket.Common
         /// Gets the name.
         /// </summary>
         [ConfigurationProperty("name")]
-        public string Name
-        {
-            get { return this["name"] as string; }
-        }
+        public string Name => this["name"] as string;
 
         /// <summary>
         /// Reads XML from the configuration file.
@@ -165,5 +157,4 @@ namespace SuperSocket.Common
             return true;
         }
     }
-#endif
 }

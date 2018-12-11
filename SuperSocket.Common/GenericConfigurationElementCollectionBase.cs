@@ -1,15 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-#if !NETSTANDARD2_0
+﻿using System.Collections.Generic;
 using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
-#endif
 
 namespace SuperSocket.Common
 {
-#if !NETSTANDARD2_0
     /// <summary>
     /// GenericConfigurationElementCollectionBase
     /// </summary>
@@ -26,15 +19,15 @@ namespace SuperSocket.Common
         {
             get
             {
-                return (TConfigElement)base.BaseGet(index);
+                return (TConfigElement)BaseGet(index);
             }
             set
             {
-                if (base.BaseGet(index) != null)
+                if (BaseGet(index) != null)
                 {
-                    base.BaseRemoveAt(index);
+                    BaseRemoveAt(index);
                 }
-                this.BaseAdd(index, value as ConfigurationElement);
+                BaseAdd(index, value as ConfigurationElement);
             }
         }
 
@@ -44,10 +37,7 @@ namespace SuperSocket.Common
         /// <returns>
         /// A new <see cref="T:System.Configuration.ConfigurationElement"/>.
         /// </returns>
-        protected override ConfigurationElement CreateNewElement()
-        {
-            return new TConfigElement() as ConfigurationElement;
-        }
+        protected override ConfigurationElement CreateNewElement() => new TConfigElement() as ConfigurationElement;
 
         /// <summary>
         /// Gets the element key for a specified configuration element when overridden in a derived class.
@@ -56,12 +46,9 @@ namespace SuperSocket.Common
         /// <returns>
         /// An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
         /// </returns>
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            return element;
-        }
+        protected override object GetElementKey(ConfigurationElement element) => element;
 
-    #region IEnumerable[T] implementation
+        #region IEnumerable[T] implementation
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
@@ -71,7 +58,7 @@ namespace SuperSocket.Common
         /// </returns>
         public new IEnumerator<TConfigInterface> GetEnumerator()
         {
-            int count = base.Count;
+            int count = Count;
 
             for (int i = 0; i < count; i++)
             {
@@ -79,7 +66,7 @@ namespace SuperSocket.Common
             }
         }
 
-    #endregion
+        #endregion
     }
 
     /// <summary>
@@ -95,33 +82,6 @@ namespace SuperSocket.Common
         /// </summary>
         /// <param name="element">The element.</param>
         /// <returns></returns>
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            return ((TConfigElement)element).Name;
-        }
+        protected override object GetElementKey(ConfigurationElement element) => ((TConfigElement)element).Name;
     }
-#else     
-    /// <summary>
-    /// GenericConfigurationElementCollectionBase
-    /// </summary>
-    /// <typeparam name="TConfigElement">The type of the config element.</typeparam>
-    /// <typeparam name="TConfigInterface">The type of the config interface.</typeparam>
-    public class GenericConfigurationElementCollectionBase<TConfigElement, TConfigInterface> : List<TConfigInterface>, IEnumerable<TConfigInterface>
-        where TConfigElement : TConfigInterface, new()
-    {
-
-    }
-
-    /// <summary>
-    /// GenericConfigurationElementCollection
-    /// </summary>
-    /// <typeparam name="TConfigElement">The type of the config element.</typeparam>
-    /// <typeparam name="TConfigInterface">The type of the config interface.</typeparam>
-    public class GenericConfigurationElementCollection<TConfigElement, TConfigInterface> : GenericConfigurationElementCollectionBase<TConfigElement, TConfigInterface>, IEnumerable<TConfigInterface>
-        where TConfigElement : TConfigInterface, new()
-    {
-
-    }
-
-#endif
 }
